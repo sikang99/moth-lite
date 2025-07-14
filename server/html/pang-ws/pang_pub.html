@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pub</title>
+    <script src="pang_pub.js"></script>
+       <style>
+           body {
+               font-size: 20px;
+           }
+           button {
+            font-size: 20px;
+            color: black;
+            background-color: white;
+            padding: 10px 20px;
+           }
+           #canvas {
+            width: 640px;
+            height: 400px;
+            border: 2px solid black;
+           }
+           select {
+            font-size: 20px;
+            padding: 10px 20px;
+           }
+        
+       </style> 
+</head>
+<body>
+    <table>
+    <tbody><tr><td valign="top" width="50%">
+    <p>Click "Open" to create a connection to the server, 
+    "Send" to send a message to the server and "Close" to close the connection. 
+    You can change the message and send multiple times.
+    </p><p>
+    </p><form>
+    <p>
+    <select id="imageFormats">
+        <option value="none" selected>==Type==</option>
+        <option value="Stream">video</option>
+        <option value="Snapshot">image</option>
+    </select>
+    <select id="resolution">
+        <option value="none" selected>==Resolution==</option>
+        <option value="default">default (640 x 400)</option>
+        <option value="HD">HD (1280 x 720)</option>
+        <option value="FHD">FHD (1920 x 1080)</option>
+        <option value="QHD">QHD(2560 x 1440)</option>
+        <option value="4UHD">4K UHD (3840 x 2160)</option>
+        <option value="8UHD">8K UHD (7680 x 4320)</option>
+    </select>
+    <select id="formet">
+        <!-- <option value="none" selected>==formet==</option> -->
+        <option value="default">default (jpeg)</option>
+    </select>
+    <p>
+        <button type="button" id="open">Open</button>
+        <button type="button" id="close">Close</button>
+    </p>
+    <p>
+        <button type="button" id="send">Send</button>
+    </p>
+</p>
+    </form>
+    <h1>video</h1>
+    <video id="video" width="400" height="400"></video>
+
+    <h1 id="snapshotDisplay" style="display: none;">snapshot</h1>
+    <h1 id="canvasDisplay" style="display: none;">canvas</h1>
+    <canvas id="canvas" ></canvas>
+
+
+
+</td><td valign="top" width="50%">
+    <div id="output"></div>
+    </td></tr></tbody></table>
+    <script>
+
+
+
+    </script>
+
+    </body>
+</html>

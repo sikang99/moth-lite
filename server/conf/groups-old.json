@@ -1,0 +1,16 @@
+{
+   "c5c4l9d94819nrqn67i0": {
+      "common": {
+         "type": "group",
+         "id": "c5c4l9d94819nrqn67i0",
+         "name": "Avengers",
+         "style": "",
+         "state": 0,
+         "blocked": false,
+         "created_at": "2021-10-02T21:03:49.666099+09:00",
+         "used_at": "2021-10-02T21:03:49.666099+09:00",
+         "updated_at": "0001-01-01T00:00:00Z",
+         "expired_at": "0001-01-01T00:00:00Z"
+      }
+   }
+}

@@ -1,0 +1,18 @@
+{
+   "id": "clin7kcjfrmmvt7csu9",
+   "name": "moth-teamgrit-lab",
+   "time_zone": "Asia/Seoul",
+   "host_addr": "localhost",
+   "port_plain": 8276,
+   "port_secure": 8277,
+   "pem_public": "cert/cert.pem",
+   "pem_private": "cert/key.pem",
+   "dir_data": "./data",
+   "dir_record": "./data/record",
+   "key_manager": "teamgrit",
+   "key_license": "clin7kcjfrmmvt7csu90-127.0.0.1-D282040100000500100365:70386b34",
+   "sec_ticket": false,
+   "sec_host": false,
+   "host_cidr": "",
+   "cors_allow": true
+}

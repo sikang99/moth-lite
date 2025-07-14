@@ -1,0 +1,32 @@
+[
+   {
+      "common": {
+         "type": "group",
+         "id": "c5c4l9d94819nrqn67i0",
+         "name": "Avengers",
+         "desc": "",
+         "style": "",
+         "state": 0,
+         "blocked": false,
+         "at_created": "2022-05-03T14:08:19.910164+09:00",
+         "at_used": "2022-05-03T14:08:19.910163+09:00",
+         "at_updated": "0001-01-01T00:00:00Z",
+         "at_expired": "0001-01-01T00:00:00Z"
+      }
+   },
+   {
+      "common": {
+         "type": "group",
+         "id": "c7t302rqk3vcplp0k3vg",
+         "name": "Egles 5",
+         "desc": "",
+         "style": "",
+         "state": 0,
+         "blocked": false,
+         "at_created": "2022-05-03T14:08:19.910171+09:00",
+         "at_used": "2022-05-03T14:08:19.91017+09:00",
+         "at_updated": "0001-01-01T00:00:00Z",
+         "at_expired": "0001-01-01T00:00:00Z"
+      }
+   }
+]

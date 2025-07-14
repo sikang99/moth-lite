@@ -1,0 +1,13 @@
+# .gitignore
+
+.DS_Store
+Thumbs.db
+.vscode/
+
+server
+moth-nano
+moth-nano.exe
+tools/
+
+log.current
+log/

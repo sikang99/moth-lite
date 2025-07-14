@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub</title>
+    <style>
+            body {
+               font-size: 20px;
+           }
+           button {
+            font-size: 20px;
+            color: black;
+            background-color: white;
+            padding: 10px 20px;
+           }
+           #canvas {
+            border: 2px solid black;
+           }
+           select {
+            font-size: 20px;
+            padding: 10px 20px;
+           }
+    </style>
+</head>
+<body>
+    <table>
+    <tbody><tr><td valign="top" width="50%">
+    <p>Click "Open" to create a connection to the server, 
+    "Send" to send a message to the server and "Close" to close the connection. 
+    You can change the message and send multiple times.
+    </p><p>
+        채널 선택 : <select id="channles" ></select>
+    </p><form>  
+    <button type="button" id="open">Open</button>
+    <button type="button" id="close">Close</button></form>
+    <p id="mimetype">mime : </p>
+    <img id="target" style="display:inline;"/>
+    <canvas id="canvas" ></canvas>
+    </td><td valign="top" width="50%">
+    <div id="output"></div>
+    </td></tr></tbody></table>
+    <script>
+        window.addEventListener("load", function(evt) {
+            const channelMenu = document.querySelector('#channles')
+            var output = document.getElementById("output");
+            var input = document.getElementById("input");
+            let mimetype = document.getElementById("mimetype");
+            var ws;
+            let saveChannle = [];
+            let host = window.location.hostname;
+            let port = 8276;
+            let http = 'https';
+
+            if (window.location.protocol == 'https:') {
+                port = 8277;
+                http = 'https';
+            } else {
+                prot = 8276;
+                http = 'http';
+            }
+            // host ='cobot.center'
+            let APIOption = {
+                mode : "sub",
+                channel : "btlb3pjpc98lsdbc0lj0", //인디프로그  c3rl3c86n88jq9lrl3gg
+                track : "video"
+            }
+
+            var print = function(message) { //output 자식노드로 div 생성.
+                var d = document.createElement("div");
+                d.innerHTML = message;
+                output.appendChild(d);
+                if (output.children.length > 10){
+                    while (output.hasChildNodes() ) {
+                        output.removeChild(output.firstChild);
+                    }
+                }
+                
+            };
+            document.getElementById("open").onclick = function(evt) {
+                if (ws) {
+                    return false;
+                }
+                //url 조정
+                let wsurl;
+                // const cojamUrl = 'cobot.center'
+
+                // host = cojamUrl;
+
+                if (window.location.protocol == 'https:') {
+                    wsurl = `wss://${host}:${port}/pang/ws/${APIOption.mode}?channel=${APIOption.channel}&track=${APIOption.track}`;
+                } else {
+                    wsurl = `ws://${host}:${port}/pang/ws/${APIOption.mode}?channel=${APIOption.channel}&track=${APIOption.track}`;
+                }
+                //url 조정
+
+                ws = new WebSocket(wsurl);
+                ws.binaryType = 'arraybuffer';
+
+                ws.onopen = function(evt) {
+                    print("OPEN");
+                }
+                ws.onclose = function(evt) {
+                    print("CLOSE");
+                    ws = null;
+                }
+                ws.onmessage = function(evt) {
+                    console.log(typeof evt.data)
+                    if (typeof evt.data == "object") {
+                        draw(evt.data)
+                    } else if (typeof evt.data == "string") {
+                        mimetype.innerHTML = `mime.Type = ${evt.data}`
+                    } else {
+                        print("RESPONSE: " + evt.data);
+                    }
+                }
+                ws.onerror = function(evt) {
+                    print("ERROR: " + evt.data);
+                }
+                return false;
+            };
+            channelMenu.onchange = function(e) { //채널을 클릭했을 떄.
+                APIOption.channel = saveChannle[this.value][1];
+            }
+            const openChannle = function()  {  // 채널 목록 불러오기.
+                fetch(`${http}://${host}:${port}/control/http/cmd?format=json&obj=channel&op=show`)
+                    .then(function(response) {
+                        return response.json()
+                })
+                    .then(function(response) {
+                        // if (!response) {
+                        //     const _option = document.createElement('option')
+                        //     _option.text = '송출중인 채널이 없습니다.'
+                        //     channelMenu.append(_option)
+                        //     return;
+                        // }
+                        response.map((state, index) => {
+                            if (response[index].state === 1 ){
+                                const _option = document.createElement('option')
+                                option = _option
+                                saveChannle.push([state.name, state.id])
+                                option.text = state.name
+                                option.value = index
+                                channelMenu.append(option)
+                                APIOption.channel = saveChannle[0][1] //처음 선택된 채널의 값을 적용.
+                            }
+                        })
+                        if (saveChannle.length === 0) {
+                            console.log("???")
+                            const _option = document.createElement('option')
+                            _option.text = '송출중인 채널이 없습니다.'
+                            channelMenu.append(_option)
+                        }
+                });
+            }
+            // document.getElementById("send").onclick = function(evt) {
+            //     if (!ws) {
+            //         return false;
+            //     }
+            //     print("SEND: " + input.value);
+            //     ws.send(input.value);
+            //     return false;
+            // };
+            document.getElementById("close").onclick = function(evt) {
+                if (!ws) {
+                    return false;
+                }
+                ws.close();
+                return false;
+            };
+
+            openChannle();
+        });
+
+    // ------------------------------------
+    // canvas
+
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    let imageSize = {
+        width : 640,
+        height : 480
+    }
+    window.onload = () => {
+        canvas.style.width = 640;
+        canvas.style.height = 480;
+    }
+        function draw(data) {
+            var arrayBufferView = new Uint8Array( data );
+            var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+            var urlCreator = window.URL || window.webkitURL;
+            var imageUrl = urlCreator.createObjectURL( blob );
+
+
+            var img  = new Image();
+
+            var imageData = imageUrl  //'data:image/jpeg;base64,' + Json;
+            img.src = imageData;
+            console.log(blob.size)
+            if (blob.size > 20000 && blob.size < 75000) {
+                imageSize.width = 640;
+                imageSize.height = 480;
+            }
+            if (blob.size > 75000 && blob.size < 150000) { //HD
+                imageSize.width = 1280;
+                imageSize.height = 720;
+            }
+            if (blob.size > 150000 && blob.size < 190000) { //FHD
+                imageSize.width = 1920;
+                imageSize.height = 1080;
+            }
+            if (blob.size > 200000 && blob.size < 300000) { //QHD
+                imageSize.width = 2560;
+                imageSize.height = 1440;
+            }
+
+            img.onload = function(){
+                canvas.style.width = imageSize.width;
+                canvas.style.height = imageSize.height;
+                canvas.width = imageSize.width;
+                canvas.height = imageSize.height;
+                ctx.drawImage(img,0,0,imageSize.width,imageSize.height);
+            };
+        }
+
+    </script>
+
+    </body>
+</html>

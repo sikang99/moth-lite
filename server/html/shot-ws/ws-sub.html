@@ -1,0 +1,52 @@
+<html>
+<head>
+<title>Video Display (WebSocket)</title>
+</head>
+<body style="padding:10px;">
+<img id="target" style="display:inline;"/>
+<canvas id="canvas" style="display:inline;"></canvas>
+<script type="text/javascript">
+    let wsurl
+    if (window.location.protocol == 'https:') {
+        wsurl = 'wss://' + window.location.hostname + ':8277/shot/ws/sub' + '?channel=btlb3pjpc98lsdbc0lj0';
+    } else {
+        wsurl = 'ws://' + window.location.hostname + ':8276/shot/ws/sub' + '?channel=btlb3pjpc98lsdbc0lj0';
+    }
+
+    function hexToBase64(str) {
+        return btoa(String.fromCharCode.apply(null, str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ")));
+    }
+
+    console.log(wsurl)
+    // window.location.hostname
+    ws = new WebSocket(wsurl)
+    
+    ws.onopen = function () {
+        console.log("Websocket connection enstablished");
+    };
+    
+    ws.onclose = function () {
+        console.log("Websocket disconnected");
+    };
+    
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+    // ub: unit buffer of data
+   
+    ws.onmessage = function (message) {
+        // console.log(message)
+        var img  = new Image()
+        ub = JSON.parse(message.data)
+        // var imageData = new Uint8Array(ub.data);
+        var imageData = 'data:image/jpeg;base64,' + ub.data;
+        img.src = imageData;
+        // console.log(ub.length)
+        img.onload = function(){
+            canvas.width = img.width
+            canvas.height = img.height
+            ctx.drawImage(img,0,0,img.width,img.height);
+        };
+    };
+</script>
+</body>
+</html>

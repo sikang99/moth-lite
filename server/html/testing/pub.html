@@ -1,0 +1,113 @@
+<html>
+<head>
+<title>Video Display (WebSocket)</title>
+</head>
+<body style="padding:10px;">
+<img id="target" style="display:inline;"/>
+
+<video id="video" width="400" height="400" autoplay  ></video>
+<canvas id="pub_canvas" width="400" height="400" ></canvas>
+</br>
+<button onclick="start()">송출시작</button>
+<button onclick="sendImg()">캡쳐이미지송출</button>
+<script type="text/javascript">
+    let wsurl;
+    let ws;
+    let img = "";
+
+    // wsurl option
+    const APIOption = {
+        mode : "pub",
+        channel : "btlb3pjpc98lsdbc0lj0",
+        track : "video"
+    }
+	if (window.location.protocol == 'https:') {
+		wsurl = `wss://` + window.location.hostname + `:8277/shot/ws/${APIOption.mode}?channel=${APIOption.channel}&track=${APIOption.track}`;
+	} else {
+		wsurl = `ws://` + window.location.hostname + `:8276/shot/ws/${APIOption.mode}?channel=${APIOption.channel}&track=${APIOption.track}`;
+    }
+
+    function hexToBase64(str) {
+        return btoa(String.fromCharCode.apply(null, str.replace(/\r|\n/g, "").replace(/([\da-fA-F]{2}) ?/g, "0x$1 ").replace(/ +$/, "").split(" ")));
+    }
+
+    console.log(wsurl)
+    // window.location.hostname
+    ws = new WebSocket(wsurl)
+
+    ws.onopen = function () {
+        console.log("Websocket connection enstablished");
+    };
+    ws.onclose = function (event) {
+        console.log("Websocket disconnected",event);
+    };
+    ws.onerror = (e) => {
+        console.log("err : ",e)
+    }
+
+    var canvas = document.getElementById("canvas");
+    // var ctx = pub_canvas.getContext('2d');
+
+    
+    // 송출
+
+    let video = document.querySelector('#video');
+    const constraints = {
+        audio: true,
+        video: true
+    }
+    let pub_canvas = document.getElementById("pub_canvas");
+    let imgData = {
+        FrameType : 0,
+        Mime : "image/jpeg",
+        // Header : {"Content-Length":[img.length],"Content-":["image/jpeg"]},
+        Length : 0,
+        Data : null
+    };
+    window.onload = () => {
+        navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(stream) {
+        /* 스트림 사용 */
+            video.srcObject = stream;
+        })
+        .catch(function(err) {
+        /* 오류 처리 */
+        console.log("에러 : ",err)
+        });
+    }
+
+    start = () => {
+        setInterval(draw, 80);
+    }
+    function dataURItoBlob(dataURI) {
+        var byteString = atob(dataURI.split(',')[1]);
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < byteString.length; i++)
+        {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        var bb = new Blob([ab], { "type": mimeString });
+        return bb;
+    }
+
+    draw = () => {
+        let ctx = pub_canvas.getContext('2d').drawImage(video, 0, 0, pub_canvas.width, pub_canvas.height)
+        img = pub_canvas.toDataURL("image/jpg");
+        // console.log(img)
+        // imgData.Header.Content-Length[0] = img.length;
+        imgData.length = img.length;
+        imgData.data = btoa(img);
+        ws.send(JSON.stringify(imgData));
+        // requestAnimationFrame(draw);
+    }
+    sendImg = () => {
+        console.log(JSON.stringify(imgData));
+        // ws.send(JSON.stringify(imgData));
+    }
+ 
+</script>
+</body>
+</html>

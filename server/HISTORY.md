@@ -1,0 +1,973 @@
+## HISTORY.md
+> Moth Real-Time IoT Media Server Development History
+> RSSP: Real Simple Stupid (Streaming) Protocol
+
+### Considerations
+- FOTA server : Doodle
+- BLE Update on Device
+- Group control
+- Swarm control
+
+### TBDs
+- [?] record functions for a media track having audio and video in a track
+- [x] channel security by key, determined in the 1st connection
+- [x] make API status for key setting on the channel
+- [ ] buffer control per pipe (directional buffer)
+- [x] p2p API supporting connection waiting
+- [ ] sub API to send data with its timestamp
+- [ ] change MIME info from track to buffer (pipe)
+- [x] support TCP server
+- [x] support QUIC(UDP) server
+- [x] support WebTransport server
+- [ ] support MCP server
+
+### RSSPv2, /zang/(protocol)/(style) API
+- [ ] 4CC based Text Message, ex) MIME(default), PING
+- [ ] Pipe(Buffer) based MIME
+
+
+### Changelogs
+- 2025/06/13 : v1.1.7.5
+    - add "REXT" in the message handling
+    - define `/pang/ws/a2a` for agent communication
+    - update golang `v1.23.10`, `v1.24.4`, `v1.25rc1`
+- 2025/03/04 : v1.1.7.4
+    - remove `brew remove gstreamer-runtime gstreamer-development`
+        - install `brew install gstreamer`
+    - add `api-mcp-http.go`
+    - License for [NICS](https://nics.me.go.kr/eng/main.do), 22/1000
+- 2025/03/01 : v1.1.7.3
+    - define a new field of `Style` in Worker, usually it has "system" 
+    - support multi-source/track of a channel in bridging
+    - update bridge flow : check/runBridge -> startBridge -> startPush/PullBridge
+- 2025/02/21 : v1.1.7.2
+    - **WARNING**: in new golang compilers
+        - display the build messages of `ld: warning: can't parse dwarf compilation unit info ...`
+        - this is caused by `-s -w-` compile option
+    - update golang `v1.22.12`, `v1.23.6`, `v1.24.0`
+    - add `go clean -cache -modcache -testcache` as `make clean` in Makefile
+- 2025/02/09 : v1.1.7.1
+    - divide `PangWSCaster()` into `PangWSPusher()` and `PangWSPuller()`
+    - add `EventState` in `Studio` to handle studio events safely
+- 2025/02/07 : v1.1.7.0
+    - rename `startBridge()` to `startPushBridge()` and `startPullBridge()`
+    - **PROBLEM**: some error like deadlock in the event channel handling
+    - refactor bridge & event handling parts
+    - update `setBridgeValue()` in data-mesh.go
+- 2025/01/31 : v1.1.6.9
+    - add machine id verification in license key
+    - **FIX** handling error for version 3 license key
+- 2025/01/16 : v1.1.6.8
+    - check [gortc](https://github.com/AlexxIT/go2rtc) to extend functionality of moth
+    - upgrade `quic-go v0.47.0` using `webtransport-go v0.8.0`
+    - add license v3 key format: [xid]-[ip]-[nums]![hash] // v2 : -> v3 ? for hash part
+------------------------------------------------------------------------------------------------------    
+- 2024/12/03 : v1.1.6.7
+    - use `golang:1.22.11-alpine3.20` as the docker base image with `docker v27.4.0`
+    - upgrade `hybridgroup/gocv` to `v0.40.0` for `opencv v4.11.0`
+    - upgrade `fasthttp/websocket` to `v1.5.12`
+    - add to define Raknet, KCP ports in moth.json
+    - update go `1.22.11`,`1.23.5`, and `1.24rc2`
+    - divide `system.go` into `system.go`(linux, darwin) and `system_windows.go`
+    - **WARNING**
+    ```
+    2024/12/11 08:08:50 sys_conn.go:36: failed to sufficiently increase receive buffer size (was: 208 kiB, wanted: 7168 kiB, got: 416 kiB). See https://github.com/quic-go/quic-go/wiki/UDP-Buffer-Sizes for details.
+        sysctl -w net.core.rmem_max=7340032
+        sysctl -w net.core.wmem_max=7340032
+    ```
+    - [quic-go docs](https://quic-go.net/docs/)
+    - build test for GOOS=windows GOARCH=amd64
+        - comment out parts only for linux or darwin, `system.go`
+    - define `quic_secure: 18277` in moth.json
+- 2024/10/28 : v1.1.6.6
+    - add fields of `Addr, Proto` in `Worker`
+    - rename `api-pang-mpws.go` into `api-pang-quic.go`
+    - remove MPWS(multi-path websocket) parts, because it is not completed
+    - update `xtaci/kcp-go` from v5.6.2 into v5.6.16
+        - KCP: Fast and Reliable ARQ Protocol, FEC too.
+    - write UDP test tools in `moth/tools/pang-udp/`
+        - [Networking - Awesome Go](https://awesome-go.com/networking/)
+        - [High-Speed Packet Transmission in Go: From net.Dial to AF_XDP](https://toonk.io/sending-network-packets-in-go/index.html)
+        - [atoonk/go-pktgen](https://github.com/atoonk/go-pktgen)
+        - [google/gopacket](https://github.com/google/gopacket)
+    - update `go 1.22.9, 1.23.3` 
+- 2024/10/10 : v1.1.6.5
+    - define 4CC and 2CC codes for Text, Binary, Control messages
+    - make tools for TCP hole punching
+    - define a new structure of `Punch` for hole punching
+    - **PROBLEM**: local ip checking error in License
+    - make tools for TCP direct communication in `moth/tools/pang-tcp/*`
+    - support TCP port setting in moth config of `conf/moth.json`
+        - default ports TCP/S = 8274/8275
+- 2024/10/07 : v1.1.6.4
+    - update `Alpine 3.20` as Docker Linux
+    - support base APIs of `/eco/pub/sub/meb` in RSSP
+    - support TCS TLS(secure) mode, not complete
+    - write `TCPReflector()` for `/pang/tcp/eco`
+    - use `alpine 3.20` for docker
+- 2024/08/12 : v1.1.6.3
+    - **PROBLEM**: gocv v0.38.0 causes docker build error. Maybe mismatch with opencv version
+        - resolved by using gocv v0.37.0
+    - write `PangTCPPublisher()` and `PangTCPSubscriber()`
+    - write TCP plain and secure servers in `api-pang-tcp.go`
+    - register api servers for protocols such as http, https, http3, kcp, rn, tcp as workers
+    - **NOTICE**: force to use go version specified in go.mod toolchain
+        - if toolchain go1.21.1 is specified, it is used instead of go1.21.13
+    - use `gocv 0.38.0` for `opencv 4.10.0`
+    - think about zang, kang APIs
+    - start to code for zang API based on RSSPv2
+    - change to have no locking (false) in `recvTrackBufferInWSMessage(ws, s, false)` for pub case
+    - update `go 1.21.13, 1.22.8, 1.23.2` 
+- 2024/07/28 : v1.1.6.2
+    - add `/pang/ws/d2m` API to monitor data of d2x pub/sub
+    - add `resetTrackInfo()`
+- 2024/07/21 : v1.1.6.1
+    - define a new data structure, `Pipe` of go channel with Slots
+    - define a new API of `/pang/ws/d2p,d2s`, 1:1 p2p with pub/sub mode
+    - modify the processing method for `/pang/ws/p2p`
+- 2024/07/15 : v1.1.6.0
+    - modify `ListResources()` for displaying the channel track in manager
+    - write `copyMessageToBuffer()` in p2p ws
+    - consider [Media over QUIC Transport Implementation](https://github.com/mengelbart/moqtransport)
+    - write handling functions for webtransport datagram, `Send/RecvWTPacket()`
+    - define `mode=shoot` option for datagram support
+    - update to `Docker Desktop 4.32.0 (157355)`
+-------------------------------------------------------------------------------------------------------
+- 2024/06/23 : v1.1.5.9
+    - modify p2p api for websocket and webtransport slightly
+    - use `websocket v1.5.10` for `go 1.22`
+    - use `gocv 0.37.0` for `opencv 4.10.0`
+    - use `go1.22.*` versions
+        - `-rwxr-xr-x  1 stoney  staff  9185906 Jul  9 13:05 moth*` in go1.22.5
+        - `-rwxr-xr-x  1 stoney  staff  9185890 Jun 23 16:02 moth*` in go1.22.4
+    - update [gstreamer 1.24.5](https://gstreamer.freedesktop.org/releases/1.24/#1.24.5)
+- 2024/04/28 : v1.1.5.8
+    - test send/recv in Datagram
+        - `session.SendDatagram(byte), session.ReceiveDatagram(context)`
+    - use `quic-go v0.43.0` and `webtransport v0.8.0` supporting Datagram
+      - [The quic-go Protocol Suite](https://quic-go.net/docs/)
+    - use `go1.22.3`  
+        - `-rwxr-xr-x  1 stoney  staff  9185890 Apr 28 17:18 moth*`
+- 2024/04/01 : v1.1.5.7
+    - use `golang:1.22.2-alpine3.19` with `Server: Docker Desktop 4.28.0 (139021)`
+    - change version number : v0.1.5.7 -> `v1.1.5.7` recommended by CEO Kim
+    - use `gocv 0.36.1` for `opencv 4.9.0_7`
+        - $ brew reinstall, cleanup opencv on build errors
+    - use `go1.22.2` [All releases](https://go.dev/dl/)
+    - recommend compile option of `-ldflags="-s -w" -trimpath`
+    - **NOTICE**:
+        - pang-wt/vid-cast runtime error on building with go1.22
+        - build error with `-trimpath` option in go build
+- 2024/01/23 : v0.1.5.6
+    - use `golang:1.22.1-alpine3.19` for docker
+    - use `websocket v1.5.8` for `go 1.22`
+    - use `webtransport-go v0.7.0` and `quic-go v0.42.0`
+        - support [Extended CONNECT](https://github.com/quic-go/webtransport-go/releases/tag/v0.7.0)
+    - use `gstreamer v1.24.1`
+    - update `go 1.20.14, 1.21.8, 1.22.1` 
+    - **FIX**: go compiler above 1.21 with `gocv 0.36.0` for `opencv 4.9.0` and `go 1.22`
+    - use `gstreamer v1.22.9` with orc
+    - update `> show channel block` command to support on, off states
+- 2023/11/10 : v0.1.5.5
+    - modify `> show channel block` command
+    - add `opt=block` option in `> add channel` manager command
+    - use `go1.20.13`
+    - **PROBLEM**: `go1.21.5` still has the run-time error with `gocv 0.34.0`
+    - update `gstreamer 1.22.8`
+    - assign license code of 8205 to [korea/kanavi](http://www.kanavi-mobility.com/)
+    - issue the license for [Vestek](https://vestek.co.kr) (8204) until 2024/01/01
+    - set `BUFFER_LEN_SLOTS = 20` in data-buffer.go
+    - use `fasthttp/websocket v1.5.7`
+- 2023/11/10 : v0.1.5.4
+    - add `trk.setTrackBufferSize(Buffer.Len)` in Publisher with query option `&buf_len=<number>`
+    - update `GetQueryOptionFromQuery()` in `query-option.go`
+    - use `gocv 0.35.0` for `opencv 4.8.1`
+    - use `go1.20.11` 
+    - **PROBLEM**: `go1.21.4` still has the run-time error with `gocv 0.34.0`
+- 2023/11/08 : v0.1.5.3
+    - display the buffer config information in `show config`
+    - change 7 -> 15 for BUFFER_LEN_SLOTS
+    - update `checkChannelResource()` to support `path` in Command.Option
+- 2023/11/05 : v0.1.5.2
+    - update `checkChannelResource()` to support checking attributes (block, key) of channel
+    - Example: `https://localhost:8277/monitor/http/cmd?op=check&obj=channel&id=c40hp6epjh65aeq6ne50&opt=key&format=json`
+- 2023/11/01 : v0.1.5.1
+    - **FIX**: a logical bug in Medusa buffer function for `/pang/wt/meb` API
+- 2023/10/20 : v0.1.5.0
+    - add & update go packages 
+        - `go.uber.org/automaxprocs v1.5.3` to set the correct GOMAXPROCS in container
+        - `fasthttp/websocket v1.5.6`, `quic-go/quic-go v0.40.0`, `quic-go/webtransport-go v0.6.0`
+    - check recording functions for user-defned track
+    - force set to bundle mode in meb API
+    - rename `*API2()` into `*API()` for webtransport in `api-pang-wt.go`
+-------------------------------------------------------------------------------------------------------
+- 2023/09/25 : v0.1.4.9
+    - add `PangWTMedusa()` for `/pang/wt/meb` API
+    - **NOTICE**: compiler works in go1.20.10 on MacOS 14 & Xcode 15
+    - remove old send/recv message functions for webtransport in `api-pang-wt.go`
+    - **NOTE**: `internal/gst-go/element_other.go` is not needed
+    - **PROBLEM**: MacOS 14 Sonoma & Xcode 15.0
+        - `malformed LC_DYSYMTAB` : error in Go (cgo) with the new Apple linker, ld-prime
+        - gopls problem solved by install of `go install golang.org/x/tools/gopls@latest` with `go 1.20.9`
+    - use `golang:1.21.2-alpine3.18` for docker
+    - add a new tool of `-rtype keychk` to check the license key
+    - update  `parseKeyString()` part in `util-license.go`
+    - **PROBLEM**: go 1.20.8 compiler cause a build warning message of `malformed LC_DYSYMTAB`:q
+    - write `PangWTMultiStreaming()` for parallel transmission
+    - **PROBLEM**: run error of `killed 9` from gocv binaries built by go 1.21.x compiler
+        - no problem for go 1.20.8 compiler
+    - use `quic-go 0.39.0`, `webtransport-go v0.6.0`, `gstreamer 1.22.6`, `gocv 0.34.0`, `opencv 4.8.0`
+    - [OpenCV 4.8.0 Is Now Available!](https://opencv.org/blog/2023/07/02/opencv-4-8-0/)
+- 2023/09/17 : v0.1.4.8
+    - recode `PangWTPeering()` part for p2p to use the webtransport stream handle
+    - **NOTE** : `chrome://flags/#webtransport-developer-mode`
+    - add `checkOriginWebTransport()` in HTTP3 (webtransport) server to allow CORS
+    - use `go 1.21.1`, `gocv 0.32.0`, `opencv 4.8.0`, `quic-go 0.38.1`
+    - understand [Profile-guided optimization in Go 1.21](https://go.dev/blog/pgo)
+        - 2% and 7% CPU usage improvements from enabling PGO
+        - two PGO optimizations : inlining and devirtualization
+- 2023/09/04 : v0.1.4.7
+    - **PROBLEM** : CORSAllow does Not work for webtransport
+    - set the demo license values as 10 days, 2 channels (in), 5 sessions (out)
+    - add `countChannels/SessionsUsing()` for in/out of the license in `data-studio.go`
+    - **NOTICE** : go 1.21 has less binary size than go 1.20 for moth server
+- 2023/08/15 : v0.1.4.6
+    - use `quic-go v0.38.1`, `webtransport-go v0.5.3`
+        - eneric Segmentation Offload (GSO), Demultiplexing QUIC
+        - checked whether `go 1.21.0` is supported
+    - add `allowCORS()` in `setupWTServerAPIs()`
+    - change `RecvWTMessage()` in checking data size
+    - **NOTICE** : License format change
+        - add a new tag for license key to check ip address
+        - add a new license key mode (ver=2) to define the expire date
+    - define `(wt *webtransport.Session)` in `Session` structure
+    - write a new `vid-p2p` tool for testing `/pang/wt/p2p` API
+    - write `PangWTPeering()` for `/pang/wt/p2p` API
+- 2023/08/07 : v0.1.4.5 (Experimental)
+    - use `golang:1.20.7-alpine3.18` for building docker image
+    - support single and bundle modes in pub, sub APIs
+        - testing for `handlBuffersByPangWTAPI2()`
+    - update buffer handling parts in Publisher/Subscriber for WT
+    - add timeout value to `Send/RecvWTMessage()` in `webtransport.go`
+    - **WARNING**: build error with `go 1.20.0` for QUIC TLS part
+    - need to test `buf_len` query option for real use
+    - define `buf_cap` option to define the track buffer capability `query_option.go`
+    - upgrade to `golang 1.20.6` and `alpine 3.18` in docker
+- 2023/07/24 : v0.1.4.4
+    - upgrade to `gstreamer v1.22.5`, `opencv v4.8.0` 
+    - use `gocv.io/x/gocv` v0.32.0 not use v0.33.0 for docker build
+    - change 5/10 to 7/15 for the numbers of buffer slots
+    - check the default the number of slots in a buffer, currently BUFFER_LEN_SLOTS=5
+    - fix the use of  deprecate `io/ioutil` package
+        ```
+        ioutil.ReadAll -> io.ReadAll
+        ioutil.ReadFile -> os.ReadFile
+        ioutil.ReadDir -> os.ReadDir
+        // others
+        ioutil.NopCloser -> io.NopCloser
+        ioutil.TempDir -> os.MkdirTemp
+        ioutil.TempFile -> os.CreateTemp
+        ioutil.WriteFile -> os.WriteFile
+        ```
+    - remove `tools/new-ws` for testing `guic-go/webtransport` change
+    - check [mengelbart/rtp-over-quic](https://github.com/mengelbart/rtp-over-quic)
+    - add `webtransport.go` which defines `SendWTMessage(), RecvWTMessage()`
+    - consider RSSP v2 using HTTP Header format
+    - moth server size : 10492082 in `go1.20.5 darwin/arm64`
+    - change `fasthttp/websocket v1.5.0` to `fasthttp/websocket v1.5.4`
+    - upgrade to `go 1.20.6`
+- 2023/05/19 : v0.1.4.3
+    - upgrade to `gstreamer v1.22.4`, `opencv v4.8.0` 
+    - fix a bug of not displaying license onwer string in show config
+        - add `MothConfig.Ownwer` field
+    - upgrade to `gstreamer v1.22.3`
+    - define bridge attribute : none, auto, ever
+    - change to upgrade
+        - `github.com/quic-go/quic-go v0.34.0`
+        - `github.com/quic-go/webtransport-go v0.5.3`
+- 2023/05/18 : v0.1.4.2
+    - write `MarshalJSON()` for `Channel` to provide n_pubs, n_subs
+        - [Custom JSON Marshaller in Go and Common Pitfalls](https://medium.com/picus-security-engineering/custom-json-marshaller-in-go-and-common-pitfalls-c43fa774db05)
+    - support add/delete pubisher and subscriber in the channel
+- 2023/04/24 : v0.1.4.1, Moving day to Kin's Tower in JungJa Dong, SeungName City
+    - defind `RSSP_MARK_MIME,CTRL`
+    - integrate gstreamer family such as gst-plugins-*, gst-python ... into the single gstreamer package
+    - support to use video test source in vid-ncast
+    - static linking works as follows
+        - `go build -tags static -o gst-vid-cast *.go`
+    - **FIX**: link errors of old gstreamer libraries
+        - remove `$GOPATH/pkg/darwin_arm64`
+    - upgrade to `gstreamer v1.22.2`, `opencv v4.7.0_4`, `ffmpeg v6.0` 
+    - search UDP based protocols such as RMNP, TRU, GameNetworkingSockets, ...
+- 2023/04/19 : v0.1.4.0
+    - build error when it uses `gocv v0.32.1`, which is solved by change `gocv v0.32.0`
+    - register raknet and kcp server in workers
+    - add `SetRead/WriteDeadline()` for kcp
+    - rename `RSSP_MARK_TEXT,BINA` into `RSSP_MARK_RTXT,RBIN` depending on 4CC
+    - support [KCP](https://github.com/skywind3000/kcp) protocol via /pang/kcp/pub,sub
+        - use `github.com/xtaci/kcp-go/v5 v5.6.2`
+    - add `gocv unset` in .zshrc to resolve the following error
+        - `dyld[26843]: Symbol not found: _CFStringCreateWithBytes`
+    - support Raknet protocol version 11 by upgrading `github.com/sandertv/go-raknet v1.12.0`
+    - test cross transmission between ws(websocket) and wt(webtransport)
+    - work again using webtransport by fixing bug
+-------------------------------------------------------------------------------------------------------
+- 2023/03/26 : v0.1.3.9
+    - **FIX**: not working problem caused by upgrading `webtransport-go v0.5.2`
+        - the reason is by `defer wt.CloseWithError()`
+    - write `util-h264.go` for handling H.264 stream
+    - [Donu](https://github.com/flavioribeiro/donut) - SRT+MPEG-TS -> WebRTC, H.264
+    - consider to classify 4CC based messages, such as MIME, CTRL
+    - change to upgrade
+        - `github.com/quic-go/quic-go v0.32.0`
+        - `github.com/quic-go/webtransport-go v0.5.2`
+    - **NOTE**: WebTransport over QUIC
+        - `github.com/lucas-clemente/quic-go v0.31.1`
+        - `github.com/marten-seemann/webtransport-go v0.2.0`
+    - write `IsKeyFrame()` in `util-codec.go`
+    - make `./build` directory of files for docker build
+    - add a new field of `TransCodec` in `Bridge`
+- 2023/03/22 : v0.1.3.8
+    - write a tool of `gst-vid-nplay` to receive data in headless mode while displaying stats
+- 2023/03/21 : v0.1.3.7
+    - **FIX**: possible to build docker image without modifying `internal/gst-go/element_other.go`
+    - build docker images including tools
+- 2023/03/20 : v0.1.3.6
+    - update `startBridge()` to filter sources and tracks if needed
+    - work `run bridge [start|stop]` commands
+    - write `stopBridge()` and `findSessionByBridgeID()`
+- 2023/03/02 : v0.1.3.5
+    - make two arch versions of docker images of `cojam/moth:0.1.2.3.5-alpine3.17-arm64.amd64`
+    - write `PangWSCaster()` to read the tracks of channel and send its stream to other location
+    - **FIX**: a bug for processing `set channel <id> block on` in cli moth manager
+    - refer repos
+        - [tiiuae/rclgo](https://github.com/tiiuae/rclgo) - ROS Client Library for Golang
+        - [dmonteroh/GoROS2WebcamPublisher](https://github.com/dmonteroh/GoROS2WebcamPublisher)
+        - [karthikshetty03/MPStream](https://github.com/karthikshetty03/MPStream)
+        - [prat-bphc52/VideoStreaming-MPTCP-MPQUIC](https://github.com/prat-bphc52/VideoStreaming-MPTCP-MPQUIC)
+    - add System.Golang of runtime.Version() for golang version
+    - move Group into `data-mesh.go`
+    - write `checkBridges()` in `data-studio.go`
+    - write `data-mesh.go` for handling mesh such as bridges
+- 2023/02/13 : v0.1.3.4
+    - upgrade to `golang 1.19` and `alpine 3.17` in docker
+    - change `Peers` to have `Session` like as `Publishers` and `Subscribers` fields
+    - consider to include [mochi-co/mqtt](https://github.com/mochi-co/mqtt) as MQTT IoT Server
+    - make `PangWSPeering()` to be working
+    - add `Peers` in `Channel` strcuture
+- 2023/02/02 : v0.1.3.3
+    - change to use `s.setTimeoutInUnit()` in setting the time unit
+    - add `unit=zero` option for no delay echo
+    - upgrade to `alpine 3.16 -> 3.17`
+- 2023/02/01 : v0.1.3.2
+    - add `PangWSReflector()` for `pang/ws/echo`
+    - upgrade to [gstreamer 1.22.0](https://gstreamer.freedesktop.org/releases/1.22/), 2023/01/23
+    - upgrade to `guic-go v1.30.0 -> 1.30.1`
+- 2023/01/10 : v0.1.3.1
+    - go upgrade `go1.19.4` to `go1.19.5`
+    - brew upgrade for `gstreamer 1.20.5`, `opencv 4.7.0_1`
+    - support multiline MIME for TS Streaming including audio, video at the same time
+        - tools: `gst-ws/mts-cast.play`
+    - upgrade `webtransport-go 0.2.0` to `0.4.2`
+        - change `session.Close()` into `session.CloseErrorCode()`
+    - upgrade `gocv 0.31.0` to `0.32.1`
+    - update license key type (version 3) to support absolute date as the expire time
+- 2022/12/13 : v0.1.3.0
+    - upgrade `/opt/homebrew/Cellar/opencv/4.7.0` by brew upgrade
+        - [GoCV](https://github.com/hybridgroup/gocv/releases) 0.32.1 for [OpenCV](https://github.com/opencv/opencv/releases) 4.7.0 (2023/1/5)
+    - write `util-base.go`, `pang-api-mws.go`
+    - define `b.setReadPos()` in `data-buffer.go` for buffer chasing
+    - add the buffer chasing(2) in send functions
+-------------------------------------------------------------------------------------------------------
+- 2022/12/05 : v0.1.2.9
+    - rename *Moth IoT Media server* to *IoRT(Robot Things)* server
+    - rename url options for handling buffers to have a prefix of `buf_*`
+    - change `BUFFER_LEN_SLOTS` from 10 to 5 
+    - build error of not found option for `-L/opt/homebrew/Cellar/glib/2.74.0/lib`
+        - `brew info glib`: stable 2.74.3 (bottled)
+    - update handling for `show channel` command with its name
+    - work for crossing delivery among websocket, raknet, webtransport
+- 2022/12/01 : v0.1.2.8
+    - **ERROR**: main.go:823: webtransport: request origin not allowed
+    - build integrated docker image of `cojam/moth:0.1.2.8-alpine3.16` for arm64, amd64
+    - work vid-cast/play on webtransport
+    - redefine `RSSP_MARK_TEXT("RTXT")/BINA("RBIN")/SIZE` for common use in various transports
+    - change `interface{}` type of bs.Data to `[]byte` type
+    - change `quic-go@0.31.0`, `webtransport-go@0.2.0` in go.mod
+- 2022/10/27 : v0.1.2.7
+    - issue a license key of korea/teamgrit for 15.164.117.44
+    - fix a logical typo error in `readObjectFileInArray()` in config-file.go
+    - change `setupServerAPIs()` and`setupMuxServerAPIs()` to functions based on `MothConfig`
+    - update `setupServerAPIs()` into `setupMuxServerAPIs()` to support CORS handling for all HTTP requests
+    - upgrade to `go1.18.8, go1.19.3 darwin/arm64`
+    - upgrade to `gstreamer 1.20.4` at `/opt/homebrew/Cellar/gstreamer/1.20.4`
+- 2022/10/15 : v0.1.2.6
+    - add `vid-cast`, `vid-play` tools in the docker image
+    - install Xcode 14.0.1 on macOS Ventura 13.0
+        - `xcodebuild -runFirstLaunch`
+    - upgrade to `github.com/marten-seemann/webtransport-go v0.1.1`
+        -  `go mod tidy -compat=go1.18`
+    - support json support for `show system` command
+    - **PROBLEM**: git push error, solved by making a new copy
+- 2022/09/20 : v0.1.2.5
+    - set a new mime option of `avc1=42001f`, H.264 codec handling with profile-level code
+    - **PROBLEM**: WebCodec unable to decode H.264 stream
+        - fix to use the same profile-level code
+    - write `IsValidHostCIDR()` to check manager access address
+    - write `ProcManagerWsEvent()` to handle studio(server) events
+    - refactor to use `isState()` and `setState()`
+- 2022/09/20 : v0.1.2.4 - cojam/moth:0.1.2.4-alpine3.16-arm64/amd64
+    - write `isState()` to combine isIdle() and isUsing()
+    - update `CleanChannels()` to check its EventState
+    - write `api-pang-common.go` from `api-pang-ws.go`
+    - write channel lock functions related with `EventState`
+    - remove `Ok` field of `Session` in the whole sources
+    - set `State` to have only two values, Idle and Using
+    - enforce checking stats to do `purgeChannel()` for idle, instant channels
+    - enhance the checking for events without using time.Sleep()
+- 2022/09/13 : v0.1.2.3 - cojam/moth:0.1.2.3-alpine3.16-arm64/amd64
+    - add `ChannelEventBroker()` to server channel events such as pubin/out, subin/out, evtin/out, ...
+    - write `GenerateCertPair()` in util-crypto.go
+    - **PROBLEM**: sending error in webtransport-go for large data?
+        - fixed by sending data correctly
+    - define a new string field of `DataType` in Slot for udp streaming such as raknet and webtransport
+    - **PROBLEM**: raknet jpeg sending error(frame size?), connection error on home (firewall?)
+    - raknet transport works on `cobot.center:8286`
+    - should open udp listen port in docker, like as `8276-8277:8276-8277/udp`
+- 2022/09/10 : v0.1.2.2 (ChooSeok, Korean Thanks Giving Day) - cojam/moth:0.1.2.2-alpine3.16-arm64/amd64
+    - update gstreamer pipeline for `gst-ws/vid-cast`
+    - **PROBLEM**: handling `setChannelByIDState()`
+    - write caster, player for [webtransport-go](https://github.com/marten-seemann/webtransport-go)
+    - updtae `api-pang-wt.go` and lt's test tools of `wt-vid-cast,play`
+    - rename `api-pang-raknet.go` into `api-pang-rn.go`, this require to rebuild go.mod,sum
+    - fix a build error of `<srt/srt.h> not found` 
+    - by setting `#cgo pkg-config: srt` in `../vendor/haivision/srtgo/*.go`
+    - by installing `brew install srt librist`
+    - [haivision/srtgo](https://github.com/haivision/srtgo) - Go bindings for SRT
+    - [rist/ristgo](https://code.videolan.org/rist/ristgo) - WIP golang bindings for libRIST
+- 2022/09/06 : v0.1.2.1
+    - use `docker buildx` command to build `linux/amd64`, `linux/arm64`
+    - upgrade to `go1.18.6` and `go1.19.1` on arm64
+        - fix the **PROBLEM**: `dyld Symbol not found`
+    - update gstreamer cast pipeline for FHD Camera on Mac M2 Air
+    - modify setting part for video source capability in the pipeline 
+    - **CAUTION**: difference in gstreamer video handling such as videoconvert, videoscale, videorate depending on camera default resolution 
+    - add and test c/s examples in tools/pang-nc for [netcode](https://netcode.io) transport
+- 2022/09/05 : v0.1.2.0
+    - port to MacOS Monterey (12.5.1) on Apple M2 Air
+    - upgrade `/opt/homebrew/Cellar/opencv/4.6.0` by brew upgrade 
+    - change `GST_PLUGIN_PATH` from `/usr/local/lib/gstreamer-1.0` into `/opt/homebrew/lib/gstreamer-1.0`
+    - update packages of `webtransport-go, gopsutil/v3`
+-------------------------------------------------------------------------------------------------------
+- 2022/08/13 : v0.1.1.9
+    - it works for vid-cast using RakNet protocol
+    - **PROBLEM**: h264 streaming error in client using [Raknet](https://github.com/facebookarchive/RakNet) protocol, 
+        - RakNet 4.081 Copyright (c) 2014, Oculus VR, Inc. BSD License
+        - solved by padding a prefix of "MOTH"
+    - extend `QueryOptionFrom*` to support raknet protocol
+    - build an error in `github.com/lucas-clemente/quic-go/internal/qtls` with go1.19
+    - use `lsof -i TCP:8276-8277`, `lsof -i UDP:8276-8277` to check if the server is running
+    - upgrade `/usr/local/Cellar/opencv/4.6.0` by brew upgrade 
+    - test `pang/kcp/pub,sub` API to support UDP based protocols
+- 2022/07/29 : v0.1.1.8
+    - display owner of license key in Config
+    - upgrade `/usr/local/Cellar/opencv/4.5.5_3` by brew upgrade 
+        - edit and redo `gocv setenv`
+    - apply json annotation of `common,inline` for Common
+    - fix a logical bug of not handling key string in http manager
+    - add `findChannelIDByName()` for `parseQuery()` to support manager, monitor APIs
+- 2022/07/21 : v0.1.1.7
+    - refactor response handling for the command request
+    - add a new monitor command of `check channel <xid> source/track` to check the source of the channel
+    - change manager, manager2 to use plain port not depending on the server certificate
+    - add optional checking for the license key
+    - issue a license key (10/100/365) for GoodGang Labs, 2022/07/27
+- 2022/07/08 : v0.1.1.6
+    - **FIX** a bug in `cleanChannels()` not to clear expired instant channels
+    - define `clean channel` manager command for testing
+    - add a new field of `code` in QueryOption
+    - test interoperability with new raspberry pi camera (Sony IMX327 sensor) made in japan
+    - fix an error of not finding xml data path in face detection by giving data option
+- 2022/07/01 : v0.1.1.5
+    - change to include `[on|off|start|stop]` into state in Command
+    - **NOTICE**: brew `opencv`(GoCV) require `ffmpeg@4`
+    - add PangWSProcessor() to support `-proc=[motion|face|aes]` style request
+    - Gihub CoPilot is started to use
+    - add set command for procs start and stop in manager
+    - define Track.Func for vid-procs in QueryOption
+    - add `moth-vid-procs` program for video processing in Dockerfile
+    - rename `setChannelByNameStyleKey()` to `setChannelByQueryOption()` for refactoring
+- 2022/06/25 : v0.1.1.4
+    - support query options of `record=on` and `trans=on` for instant channels
+    - define `Procs` fields in Channel for vision processing
+    - support `set channel <xid> start/stop` commands for record, trans, relay
+    - remove `startAudioTrans()` and integrate to `startVideoTrans()`, rename `startMediaTrans()`
+    - remove `runChannel()` and integrate to `setChannel()` with start,stop options
+    - add `-rtype=monitor2` client using timer and channel on a websocket in `monitor-client.go`
+- 2022/06/23 : v0.1.1.3
+    - fix the conversion error for pcm to opus
+    - add to check the external ip according to its tag in the license key
+- 2022/06/15 : v0.1.1.2
+    - add `Bitrate` in QueryOption
+    - add `TimeZone` field in `MothConfig` struct
+    - start to code event message handling via `/monitor/ws/event`
+    - define `License` struct and update the license key handling
+    - `brew info mkcert` : v1.4.4
+    - return back the buffering mode(`mode=<sting>`) from bundle to single
+    - [corvus-ch/zbase32](https://github.com/corvus-ch/zbase32) - z-base-32 - human-oriented base-32 encoding
+- 2022/06/12 : v0.1.1.1
+    - test [webtransport-go](https://github.com/marten-seemann/webtransport-go) code status
+    - update to use the cli flag option `-key=<string>` for manager key
+    - write `util-crypto.go` & `util-crypto_test.go` for encryption (AES,RSA) functions
+    - update `show channel <option>` handling
+    - support `!<shellcommand>` style, it translates `!` into `run shell`
+    - update `checkMonitorPermission()` for http monitor
+    - refactor the source codes for resources
+        - **NOTICE** : buffer structures use `sync.RWMutex` other than `sync.Mutex` in base structures
+    - upgrade `tinygo version 0.23.0` on my macbook
+- 2022/06/10 : v0.1.1.0
+    - remove update command from manager APIs for simplicity
+    - update `checkManagerPermission()` to check the manager key
+    - modify `updateChannel()` to change the channel name
+    - add `findChannelByName()` to check whether the channel with the same name exist or not
+    - add command of `run shell` or `!` in the manager
+    - update command handling in the manager
+    - fix `show dir` command in the manager
+    - support h265(hevc) transcoding
+-------------------------------------------------------------------------------------------------------
+- 2022/06/04 : v0.1.0.9
+    - review [gst-plugins-rs](https://gitlab.freedesktop.org/gstreamer/gst-plugins-rs/) - decoders
+    - **NOTICE**: vp9enc has 2 second delay
+    - support vp9 transcoding
+    - upgrade `go version go1.18.3, go1.17.11 darwin/amd64` on macbook
+    - add to clear all track MIME information on idle state of channel
+- 2022/06/07 : v0.1.0.8
+    - add to define `SetPingHandler()` for send and recv control messages over websocket
+        - Control: Ping, Pong, Close
+        - Data: Text, Binary
+    - check the usage for websocket ping, pong messages and thier handlers
+    - test `/pang/ws/meb` API with a text chat example program
+    - add `id, xid` command in cli manager
+- 2022/05/26 : v0.1.0.7
+    - define `Head+Data` style structure in `Slot` structure
+    - think the support for p2p connections, like as `/pang/ws/p2p`
+    - rethink the `/pang/ws/zeb` api : not defined yet
+    - base docker image: `cojam/golang:1.18.2.1-alpine-3.16`
+- 2022/05/25 : v0.1.0.6
+    - redesign the buffer handling for `/pang/ws/zeb`
+    - update `add channel` command to be more compact
+    - define `dynamic` channel (1 day) as the instant channel defined by name
+    - remove time (1 second) check in the sending part, sendTrackBufferInMessage()
+    - update Metric for Session, Channel, Track
+    - fix the wait time(max 30 seconds) for transcoding working
+- 2022/05/16 : v0.1.0.5
+    - include Metric field with Common as the common part
+    - upgrade `go version go1.18.2 darwin/amd64` on macbook
+    - upgrade `gstreamer 1.20.1 -> 1.20.2`
+    - write `tool-filter.go` for media processing between recv and send
+    - **CAUTION**: default buffer mode is `bundle` for bidirectional communication in websocket
+    - redefine InBytes, OutBytes fields in Metric
+    - add a new Palms field in Track for zeb API
+    - add ID, Label fields in Buffer
+    - define `/pang/ws/zeb` for multi audio conferencing
+    - support mime handling in `/pang/ws/meb`, `/pang/ws/seb` API
+- 2022/05/13 : v0.1.0.4
+    - update message input and processing for /pang/ws/ctl
+    - write `StartWSControlClient()` for `/pang/ws/ctl?channel=<xid>`
+    - update `gst-vid-codec.go` to test transcoding
+    - use `go1.17.10 darwin/amd64` on my mackbook pro
+- 2022/05/11 : v0.1.0.3
+    - update `PangWSTranscoder()` to check the mime of source track
+    - set 3 seconds to be ready transcoding
+    - use `go1.17.9 darwin/amd64` on my mackbook pro
+- 2022/05/10 : v0.1.0.2
+    - **CAUTION**: timing control for external tools, trans(2*seconds?) 
+    - support auto transcoding in sub with `&codec=jpeg` style option
+    - use `trans` source of channel for transcoding
+    - update `tool-trans.go` to support transcoding for JPEG, VP8, H264
+    - work VP8, H264 -> JPEG transcoding, use command option like as `jpeg-vp8`
+    - rename `startMediaTrans()` to `startVideoTrans()`
+- 2022/05/10 : v0.1.0.1
+    - update `StartHTTPManagerClient()` to be compact like as StartWSManagerClient()
+    - add `StartWSManagerClient()` and `ProcManagerWSCommand()`
+    - **NOTE**: Codec(VP8,H264,AV1) -> JPEG transcoding is needed by SeongJong Kim
+- 2022/05/09 : v0.1.0.0
+    - set demo license for an invalid license key
+    - **NOTICE**: different external ip : 222.99.48.10 (treamgrit-5G), 222.99.48.14 (teamgrit-demo-5G)
+    - align source code for manager, monitor, control parts
+    - update `set channel <xid> trans on/off` to save channels
+    - write `GetLicenseKeyString()` and `ParseLicenseKeyString()`
+    - update `GetExternalIPString()` to try two external sites, 
+        - https://ipecho.net/plain, http://myexternalip.com/raw, http://www.myipaddress.com/
+        - [ipify API](https://api.ipify.org/), [rdegges/go-ipify](https://github.com/rdegges/go-ipify)
+-------------------------------------------------------------------------------------------------------
+- 2022/05/06 : v0.0.9.9
+    - add `ExternalIP` field in Config structurre
+    - write `externapip` and `machineid` check programs in `moth/server/cmd`
+    - create `util-external.go` for utility functions using external packages
+    - create `tool-relay.go` to support protocol packet relay
+- 2022/05/03 : v0.0.9.8
+    - define TransAuto, TransState fields in Channel
+    - write `tool-trans.go` for media transcoding
+    - update to support av1 recording
+    - rename `file-record.go` to `tool-record.go`
+    - support to dictate default channel in the command manager
+        - to set the default id, use `command> <xid>`
+- 2022/05/02 : v0.0.9.7
+    - add `record=on|off` in url query option
+    - update read config files part for channel and group
+    - divide `initChannelValue()` into `newChannelValue()` and `initChannelData()`
+    - **BUG** : range error caused by setting sources from conf/channles.json
+        - solved by add `setChannelValue()` in `readObjectFileInArray()` of `config-file.go`
+- 2022/05/01 : v0.0.9.6
+    - add `ENV PATH="/moth:${PATH}"` in Dockerfile
+    - make `moth-med-record, moth-vid-record, moth-vid-trans` in `moth/tools` directory
+    - **CAUTION** : check whether docker is running 
+    - **PROBLEM** : difference between 1.18.5(alpine,docker) and 1.20.1 (macos) for `gst-go/element_other.go`
+- 2022/04/30 : v0.0.9.5
+    - upgrade base docker to `cojam/golang-1.17.8.1-alpine-3.15`
+        - [alpine](https://alpinelinux.org/) 3.15 : `gstreamer 1.18.5-r0`
+    - write a new `Dockerfile` to `moth-server` and `moth-record`
+        - ENV CGO_ENABLED=1 for `moth-record`
+    - define EventMessage in message-event.go
+    - rename `signal-ws.go` to `message-signal.go`
+- 2022/04/29 : v0.0.9.4
+    - add new API of `/pang/ws/rec` which is the same with `/pang/ws/sub` functionally
+    - define EventChan in Studio for handling event messages
+    - partially solved the problem of not saving in file
+    - set the default timeout as 10 seconds in stream recorders
+- 2022/04/27 : v0.0.9.3
+    - define DirRecord(data_record) field in MothConfig
+    - support auto recording on staring pub
+    - add `set channel <xid> record on/off`
+    - modify `run channel <xid> record: 24` command was tested for video
+- 2022/04/07 : v0.0.9.2
+    - update addChannel() to support channel styles such as `[static|dynamic|instant]`
+    - add run command to execute a command such as recording
+    - define Custom interface field in Common struct
+    - write a test code for webtransport
+- 2022/04/06 : v0.0.9.1
+    - update studio.cleanChannels() for channel types, instant(1h), dynamic(24h,1day)
+- 2022/03/21 : v0.0.9.0
+    - define a new field of `Desc` in `Common` in `data-base.go`
+    - add another file server for `./data` directory
+- 2022/03/10 : v0.0.8.9
+    - use `docker 20.10.7, go1.16.4`
+    - use - use `go1.17.8, go1.16.15, go1.18rc1`
+    - display channel state on `show channel <xid> track`
+    - Homebrew Formulae: [gstreamer](https://formulae.brew.sh/formula/gstreamer) - 1.18.5
+        - `brew install gstreamer`
+- 2022/03/07 : v0.0.8.8
+    - reset the mime information on exit of pub
+    - **FIX**: a bug in `add channel/group` command in the old map style, not array
+- 2022/03/02 : v0.0.8.7
+    - send mime info when channel is using
+    - make so many testing tools in gst-ws directory
+- 2022/03/01 : v0.0.8.6 (3.1 Independence Movement Day)
+    - dockerized in `cojam/moth:0.0.8.6-alpine-3.15` 
+    - define fields for internal variables `(chn, src, trk)` in Session
+    - add a new field of Mime for Track, QueryOption
+    - use `golang1.17.7`
+- 2022/02/21 : v0.0.8.5
+    - define some constants such as MAX_SLOT_SIZE, MAX_UDP_PKT_SIZE
+    - NOTICE: write udp 127.0.0.1:56680->127.0.0.1:56001: **write: message too long 0**
+        - By default macOS has limited the maximum UDP-package to be 9216
+        - `sudo sysctl -w net.inet.udp.maxdgram=65535`
+        - [set max packet size for GCDAsyncUdpSocket](https://stackoverflow.com/questions/9123098/set-max-packet-size-for-gcdasyncudpsocket)
+- 2022/02/20 : v0.0.8.4
+    - write `open/closeUDPClient/ServerPort()`
+    - write `GetFreeTCPPort/Ports()` in `api-pang-tcp.go`
+    - support to find a udp port of server automatically
+    - define `Addr{Network,Host,Port}` struct for networking address
+    - add system.go for handling system information
+- 2022/02/03 : v0.0.8.3
+    - define Host part in QueryOption
+    - write `PangTCPHandler(), PangUDPHandler()`
+- 2022/02/02 : v0.0.8.2
+    - handle to read config file of conf/moth.json
+    - rename ---At fields into At--- of Common
+- 2022/02/02 : v0.0.8.1
+    - rename KeyPublic/KetPrivate into PEMPublic/PEMPrivate of MothConfig
+    - rename HostSec/TicketSec into SecHost/SecTicket of MothConfig
+    - update to read and write config files in arrary type of json : config-file.go
+- 2022/02/01 : v0.0.8.0
+    - change Command.URL into Command.Path
+    - update execMonitor() : monitor-cmd.go
+    - use `docker 20.10.7` on macosx
+    - use `golang1.17.6` and ``cojam/golang:1.17.6.1-alpine-3.15`
+    - use `OpenCV 4.5.4_3` in `/usr/local/Cellar/opencv/4.5.4_3` by `brew upgrade opencv`
+- 2022/00/00 ---------------------------------------------------------------------------------------
+- 2021/11/07 : v0.0.7.2
+    - [GStreamer-SVT-AV1](https://github.com/AOMediaCodec/SVT-AV1/blob/master/gstreamer-plugin/README.md)
+    - brew upgrade rav1e, dav1d
+        - [rav1e](https://github.com/xiph/rav1e) - 0.5.0, 
+        - [dav1d](https://github.com/videolan/dav1d) - 0.9.2
+- 2021/10/10 : v0.0.7
+    - add LockOSThread() in pub parts
+    - include a test mqtt server of [Gmqtt](https://github.com/DrmagicE/gmqtt)
+    - add loadChannels() and loadGroups()
+    - display "JSON Error: <error>" for common json format mistakes
+    - consider tcp hole punching
+    - remove `bundle` option and support it as the default
+    - check [Niraj-Fonseka/recognize](https://github.com/Niraj-Fonseka/recognize) - grpc-based opencv example
+    - test some grpc examples such as helloworld, config
+- 2021/09/23 : v0.0.6 
+    - fix a bug in `cmd.showChannels()` via `/monitor/http/cmd`
+        - `http://localhost:8276/monitor/http/cmd?op=show&obj=channel&state=using`
+    - define Metric and add TotalBytes in a session
+    - rename Addr into HostAddr of Config (0.0.6.7)
+    - enforce command processing for `show [session|channel] [idle|using|block|<name>]` 
+    - define `Group` as a set of `Channel`s or `Session` (0.0.6.6)
+    - refactor pang APIs (0.0.6.4)
+    - add `handleBuffersbyAPI()` for buffer handling in `pang/ws/*` APIs
+    - remove codes having warnings from golang static checker
+    - support to find a channel with name and its style
+    - fix `add channel` command in manager (0.0.6.3)
+    - add `peb` and `seb` modes corresponding to `pub` and `sub`
+    - consider a new kerberos mode for secure communication
+    - support a new `meb` broadcast mode having both `pub` and `sub` modes simultaneously
+    - consider WebTransport as `wt` as the nickname of protocol
+    - check [LdDl/odam](https://github.com/LdDl/odam) - ODAM: Object detection and Monitoring
+    - check [LdDl/go-darknet](https://github.com/LdDl/go-darknet) - Go bindings for Darknet (YOLO v4 / v3)
+    - check [hybridgroup/gophercar](https://github.com/hybridgroup/gophercar)
+    - test [wimspaargaren/yolov3](https://github.com/wimspaargaren/yolov3) using gocv
+- 2021/08/20 : v0.0.5 - (0.0.5.6,Indifrog,App)
+    - add `set config` command to set the manager key
+    - define Style field in Track to check whether mulitple use is possible
+    - change structure of Config in the common style
+    - rename `data.go buffer.go` into `data-base.go data-buffer.go`
+    - use `golang1.17.1` both in macos (build) and docker (production)
+    - add `pStudio.setChannelByNameStyleKey()` in `query-option.go`
+    - set the buffer size of websocket to 1KByte (control), 2KByte (stream)
+    - 2021/09/10 cobot.center : cojam/moth:0.0.5.6-alpine-3.14
+    - apply timeout to pub session too
+    - support to use an instant channel for pub and sub accesses like as following styles
+        - pub: channel=instant&name=CAM32&key=moth
+        - sub: channel=instant&name=CAM32&key=moth
+    - write `cmd.getChannel()` to assign a new channel with the given style
+    - add to check the stream key needed to use the channel in pub
+    - rename `s.TimeScale` into `s.TimeClock` in Session
+    - **FIX**: perfect timeout control in sub sessions
+    - use a buffer lock on write a slot, `writeSlot()`
+    - add a [file rotate logger](https://github.com/lestrrat/go-file-rotatelogs) 
+    - rename field name in MothConfig
+    - rename functions named with `SourceTrack()` into `SourceTrackByLabel()`
+    - add `/pang/http/pub,sub` for udp based streaming
+    - define ID, Num fields in Track, Source for the future use
+    - write `pip-ws/video,image,vips,pic,avif` for testing
+    - write `pipe-ws/pub,sub` tools for raw media streaming
+    - [nebgnahz/gstreamer.md](https://gist.github.com/nebgnahz/26a60cd28f671a8b7f522e80e75a9aa5)
+    - [Media conversion](https://web.dev/media-conversion/)
+    - add to check the demo license of 30 days
+    - use `golang 1.17` and `cojam/golang:1.17.0.1-alpine-3.14`
+    - refer [Understanding Golang sleep() function](https://xwu64.github.io/2019/02/27/Understanding-Golang-sleep-function/)
+    - [malc0mn/ptp-ip](https://github.com/malc0mn/ptp-ip)
+    - golang time.Sleep() takes `1.8ms`
+- 2021/08/18 :
+    - move time control part from Buffer to Session
+    - **NOTICE**: `shot-ws.go:126: writev tcp 192.168.0.3:8276->192.168.0.96:51122: writev: broken pipe`
+    - define ID (unique), Label (unique in domain), Name (not unique)
+    - use `golang 1.16.7` in docker
+    - add CORSAllow function of MothConfig from Spider
+    - add buffering functions in two types of Message and JSON
+    - record the delay time in local : **30ms**
+    - rename Buffer fields (PosRead, PosWrite, SizeLen, SizeCap) for readability 
+    - define new Buffer fields (TimeUnit, TimeScale, TimeCount) for readability
+    - record the delay time : **80ms** for JPEG streaming in NCP cobot.center
+    - **FIX**: a timeout setting bug in shot/ws/sub handling
+    - add new pub, sub tools of `shot-ws` for /shot API
+- 2021/08/05 : v0.0.4
+    - define manager commands of followings 
+        - `set [session|channel] close` and `set channel block [on|off]` 
+    - change Stringer to use pointer type
+    - change source and track to create dynamically including base source
+    - remove sync.Mutext in Common and add sync.Mutex to Session, Channel, ...
+    - use `github.com/fsnotify/fsnotify v1.4.9`
+    - add a Controller for handling a channel status dynamically
+    - golang compilter test: moth v0.0.4.3 8320848 (go1.16.7), 8188320 (go1.17.rc2)
+    - extend query options to have `Source`, `Track`, `Buffer` structs
+    - update opencv : 4.5.3_1 -> 4.5.3_2 by `brew upgrade opencv`, `/usr/local/Cellar/opencv/4.5.3_2`
+    - extract h264 stream from media file
+        - To extract a raw video from an MP4 or FLV container you should specify the `-bsf:v h264_mp4toannexb` or `-vbfs h264_mp4toannexb` option.
+        - `ffmpeg -i test.flv -vcodec copy -an -bsf:v h264_mp4toannexb test.h264`
+        - The raw stream without H264 Annex B / NAL cannot be decode by player. With that option ffmpeg perform a simple "mux" of each h264 sample in a NAL unit.
+    - refactor to change `/control`, `/monitor` to `/monitor`, `/manager` respectively
+    - write fast api examples for parallel transmission using multiple connections
+- 2021/07/29 : v0.0.3
+    - support multiple buffers per track
+    - update control command processing parts
+    - open `/control/{http,ws}/cmd` API for service users
+    - update pang-ws/cast,play to support the bundle mode
+    - define `mode=bundle` to support bidirectional comm mode in Track transmission
+    - modify NewBuffer(n, m) to have to parameters n(cap), m(len)
+    - modify pointer handling for buffer control
+    - add to show buffering status on `show channel <xid> track` command
+    - refactor file names for monitor processing part
+- 2021/07/25 :
+    - check if the resource(channel/source/track) is available before using
+    - add mime check before data handling
+    - add to return an error return on API errors
+    - write WebSocket, WebTransport, WebCodecs, MQTT in README.md
+    - define `Timeout` in QueryOption to control the connection timeout
+    - rename bufferring functions as ones based on Track and Slot
+    - rename `RingBuffer` and `UnitBuffer` into `Track` and `Slot`, respectively
+- 2021/07/22 : v0.0.2
+    - define `/pang/ws/{pub,sub}` API using WebSocket Messaging
+    - add a command of `show channel <xid> track` to display source, track information on a channel
+    - allocate the ring buffer with a size parameter
+    - add add/deleteSourceTrack() in data.go
+    - set `audio/video/data` into `audio0/video0/data0/extra0`
+- 2021/07/20 : v0.0.1
+    - set socket timout as 30 seconds
+    - write `data-media.go, peer-ws.go` to handle sources and tracks in a channel
+- 2021/07/19 : docker support
+    - name Moth as IoT Media Server for MCU-based devices such as ESP32CAM
+    - preparing dockering files: Dockerfile, docker-compose.yml, entrypoint.sh
+- 2021/07/18 : restart to code
+    - change the port number of `8266/8267` into `8277/8277`
+- 2021/00/00 ---------------------------------------------------------------------------------------
+- 2020/12/09: restructing buffers
+    - write `buffer.go` to handle buffers
+    - handle streambuffer instead of shotbuffer
+- 2020/11/09: refactoring
+    - divide `data.go` into data.go and `data-studio.go`
+- 2020/11/07: Porting
+    - simple data strcutures of session, channel, studio
+    - simple programs of server and monitor
+
+
+### H.264 Player
+- [88 Open Source H264 Software Projects](https://opensourcelibs.com/libs/h264)
+- NPM: [H264 Packages](https://npm.io/search/keyword:h264)
+- [Streamedian](https://streamedian.com/) - RTSP Web Player
+- [Raspberry Pi - Camera live streaming using H264 format](https://www.codeinsideout.com/pdfs/blog/pi/stream-picamera-h264/pi__H264_streaming.pdf)
+- [Vigibot - The ultimate remote control for your robots](https://www.vigibot.com/)
+- [HTML5 playback for SLDP](https://softvelum.com/player/web/)
+- [How to use h264 live stream with websocket?](https://stackoverflow.com/questions/37264078/how-to-use-h264-live-stream-with-websocket/37769878)
+- [Play raw h264 live stream in browser](https://stackoverflow.com/questions/54003015/play-raw-h264-live-stream-in-browser)
+- [A minimal h264 “encoder” (C++)](https://jordicenzano.name/2014/08/31/the-source-code-of-a-minimal-h264-encoder-c/)
+- [HTML5 Live Video Streaming via WebSockets](https://phoboslab.org/log/2013/09/html5-live-video-streaming-via-websockets)
+- [Raspberry Pi : use VLC to stream webcam](https://stackoverflow.com/questions/49846400/raspberry-pi-use-vlc-to-stream-webcam-logitech-c920-h264-video-without-tran/)
+
+
+### Open Source
+- [matijagaspar/ws-avc-player](https://github.com/matijagaspar/ws-avc-player)
+- [131/h264-live-player](https://github.com/131/h264-live-player)
+- [elsampsa/websocket-mse-demo](https://github.com/elsampsa/websocket-mse-demo)
+- [Streamedian/html5_rtsp_player](https://github.com/Streamedian/html5_rtsp_player) - html5 player for rtsp stream
+- [mradionov/h264-bitstream-viewer](https://github.com/mradionov/h264-bitstream-viewer) - H264 bitstream viewer
+- [aizvorski/h264bitstream](https://github.com/aizvorski/h264bitstream) - A complete set of functions to read and write H.264 video bitstreams, in particular to examine or modify headers.
+- [shi-yan/H264Naked](https://github.com/shi-yan/H264Naked) - A H264 frame data viewer
+- [udevbe/tinyh264](https://github.com/udevbe/tinyh264) - A tiny h264 decoder, for node and browser
+- [lieff/minih264](https://github.com/lieff/minih264) - Minimalistic H264/SVC encoder single header library
+- [8bitversus/simplestream](https://github.com/8bitversus/simplestream) - Low latency point-to-point game streamer & player; best suited for 8-bit computer emulators
+- [leandromoreira/digital_video_introduction](https://github.com/leandromoreira/digital_video_introduction) - A hands-on introduction to video technology: image, video, codec (av1, vp9, h265) and more (ffmpeg encoding).
+- [leandromoreira/ffmpeg-libav-tutorial](https://github.com/leandromoreira/ffmpeg-libav-tutorial)
+- [ChihChengYang/wfs.js](https://github.com/ChihChengYang/wfs.js) - html5 player for raw h.264 streams
+- [dans98/pi-h264-to-browser](https://github.com/dans98/pi-h264-to-browser) - A Python application designed to stream hardware encoded h.264 from a Raspberry Pi directly to a browser.
+- [use-go/wsa](https://github.com/use-go/wsa) - WSA(Websocket Streaming Agent) is a stream server target for mp4/h264 streaming over websocket
+- [LoneWanderer-GH/RaspiVWS](https://github.com/LoneWanderer-GH/RaspiVWS) - Raspberry Pi Webcam Streaming with Logitech C920 and VLC
+- [kevinGodell/mse-live-player](https://github.com/kevinGodell/mse-live-player)
+- [kevinGodell/ffmpeg-streamer](https://github.com/kevinGodell/ffmpeg-streamer)
+- [kevinGodell/live-stream-media-source-extensions](https://github.com/kevinGodell/live-stream-media-source-extensions) - archived, moved to ms-live-player
+- [justinjoy/gst-android-camera](https://github.com/justinjoy/gst-android-camera)
+- [shengbinmeng/javascript-ts-player](https://github.com/shengbinmeng/javascript-ts-player) - Javascript ts player on browser
+- [gen2brain/x264-go](https://github.com/gen2brain/x264-go) - Go bindings for x264
+- [gen2brain/aac-go](https://github.com/gen2brain/aac-go) - Go bindings for vo-aacenc
+- [gen2brain/malgo](https://github.com/gen2brain/malgo) - Mini audio library
+- [xlab/opus-go](https://github.com/xlab/opus-go) - o bindings for Opus encoder/decoder reference implementation
+- [hraban/opus](https://github.com/hraban/opus) - Go wrapper for libopus (golang)
+- [ausocean/h264decode](https://github.com/ausocean/h264decode)
+- [bezineb5/go-h264-streamer](https://github.com/bezineb5/go-h264-streamer) - Golang program/library to stream H264 from a Raspberry Pi to a browser
+- [kanade2010/goav_rtp_h264_overlay_example](https://github.com/kanade2010/goav_rtp_h264_overlay_example)
+- [giorgisio/goav](https://github.com/giorgisio/goav) - Golang bindings for FFmpeg
+- [attilaolah/codec](https://github.com/attilaolah/codec) - Golang libav codec bindings (h264,aac)
+- [asticode/goav](https://github.com/asticode/goav) - Golang bindings for FFmpeg libraries
+- [asticode/go-astits/](https://github.com/asticode/go-astits/) - Demux and mux MPEG Transport Streams (.ts) natively in GO
+- [asticode/go-astiencoder](https://github.com/asticode/go-astiencoder) - Open source video encoder written in GO and based on ffmpeg C bindings
+- [Kagami/go-avif](https://github.com/Kagami/go-avif) - Go AVIF library
+- [h2non/bimg](https://github.com/h2non/bimg) - Go package for fast high-level image processing powered by libvips C library
+- [disintegration/imaging](https://github.com/disintegration/imaging) - Imaging is a simple image processing package for Go
+- [ajstarks/svgo](https://github.com/ajstarks/svgo) - Go Language Library for SVG generation
+- [kolesa-team/go-webp](https://github.com/kolesa-team/go-webp) - Simple and fast webp library for golang
+- [preslavrachev/generative-art-in-go](https://github.com/preslavrachev/generative-art-in-go) - A companion source code repository to the book "Generative Art in Go"
+- [h8gi/canvas](https://github.com/h8gi/canvas) - golang animation library
+- [anthonynsimon/bild](https://github.com/anthonynsimon/bild) - Image processing algorithms in pure Go
+- [adriancable/webtransport-go](https://github.com/adriancable/webtransport-go)
+- [langhuihui/webtransport-go](https://github.com/langhuihui/webtransport-go) - China
+
+
+### Versions for related Packages
+- 2022/09/20
+    - brew install libusb (1.0.26)
+- 2022/09/12
+    - brew upgrade opencv (4.6.0)
+    - brew install libtensorflow (2.10.0)
+    - #cgo pkg-config: tensorflow
+    - ld: warning: dylib (/opt/homebrew/Cellar/libtensorflow/2.10.0/lib/libtensorflow.so) was built for newer macOS version (12.3) than being linked (12.0)
+- 2022/06/19
+    - brew upgrade gstreamer (1.20.2 -> 1.20.3)
+- 2022/05/24 :
+    - brew upgrade gstreamer (1.20.2)
+- 2022/05/23 
+    - [Alpine Linux 1.16.0 Released](https://alpinelinux.org/posts/Alpine-3.16.0-released.html)
+- 2021/01/30 :
+    - brew upgrade opencv (4.5.4_3)
+    - gocv (0.29.0) for opencv 4.5.4 is working
+- 2021/09/12 : 
+    - brew install webp (1.2.1)
+    - brew upgrade opencv (4.5.3_2)
+    - brew upgrade ffmpeg (4.4_2)
+- 2021/09/11 : gocv (0.28.0) is working
+    - need to set environment with `customenv` for OpenCV
+- 2021/09/10 : build opencv for 4.5.1 (0.26.0), 4.5.3 (0.28.0)
+    - install opencv at `/usr/local/opencv/$(VERSION)`
+    - modify `/usr/local/lib/pkg-config/opencv4.pc`
+- 2021/08/22 : brew install libvips (8.11.3)
+    - [libvips](https://libvips.github.io/libvips/) - A fast image processing library with low memory needs
+- 2021/08/21 :
+    - GStreamer [1.18.4](https://gstreamer.freedesktop.org/releases/1.18/#1.18.4)
+    - [GStreamer Pipeline Samples](https://gist.github.com/hum4n0id/cda96fb07a34300cdb2c0e314c14df0a)
+    - [Install GStreamer 1.18 on Raspberry Pi 4](https://qengineering.eu/install-gstreamer-1.18-on-raspberry-pi-4.html) - 1.18.4
+    - GST_DEBUG=[0-9]
+- 2021/08/21 : brew upgrade tinygo (0.19.0)
+    - [macOS install guide](https://tinygo.org/getting-started/install/macos/)
+    - brew tap tinygo-org/tools
+    - brew install tinygo
+    - brew tap osx-cross/avr
+    - brew install avr-gcc
+    - brew install avrdude  
+- 2021/08/15 : brew upgrade opencv
+    - opencv lib version: 4.5.3
+    - /usr/local/Cellar/opencv/4.5.3_2 <- still error!
+- 2021/07/22 : brew upgrade opencv
+    - gocv version: 0.28.0
+    - opencv lib version: 4.5.3
+    - /usr/local/Cellar/opencv/4.5.3_1 <- still error!
+    - replace gocv.io/x/gocv v0.28.0 => github.com/hybridgroup/gocv v0.28.0
+- 2021/07/15 : brew upgrade opencv
+    - gocv version: 0.27.0
+    - opencv lib version: 4.5.2
+    - /usr/local/Cellar/opencv/4.5.3 <- error!
+- 2021/00/00
+    - gocv version: 0.26.0
+    - opencv lib version: 4.5.1
+- 2020/12/31
+    - gocv version: 0.25.0
+    - opencv lib version: 4.5.0-openvino
+    - /usr/local/Cellar/opencv/4.5.2_4 <- ok!
+
+
+### License Keys
+- 2025/07/03 : LG-PRI Torso Robot (PyungTak)
+    - MOTH_LICENSE_KEY= d1isim99ej3kphd2njog-48:21:0b:6f:ab:87-D382070103001010004839!281be64a
+- 2025/06/04 : LG-PRI Torso Robot (MaGok)
+    - MOTH_LICENSE_KEY= d0vvpd99ej3qeakhj5v0-10.157.182.169-D382070102001010004839!07c6f07b
+    - MOTH_LICENSE_KEY= d10f5s19ej3g60c3nf40-10.157.182.169-D382070100001010004839!7b7d79dc (o)
+    - MOTH_LICENSE_KEY= d10faq99ej3hdco3cngg-10.157.182.169-D382070101001010004839!db128cde
+- 2025/03/31 : [NICS](https://nics.me.go.kr/eng/main.do) (8209), 22/1000
+  - MOTH_LICENSE_KEY= cvl0bj594t0ckggg3blg-13.125.227.70-D382090101002210004839!c3a7ed72
+- 2025/03/20 : TeamGRIT Lab (8292), 100/1000
+  - MOTH_LICENSE_KEY= cvdnmhd94t00s24tqkhg-172.31.14.28-D382920102001001004748!1fd228a0
+  - MOTH_LICENSE_KEY= cvdpo5l94t025qlsngog-172.31.14.28-D382920100001001004748!7aad622c
+

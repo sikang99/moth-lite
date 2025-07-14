@@ -1,0 +1,7 @@
+# .dockerignore
+
+
+media/
+proto/
+log/
+data/

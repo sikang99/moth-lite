@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub</title>
+    <script src="pang_sub.js"></script>
+    <style>
+            body {
+               font-size: 20px;
+           }
+           button {
+            font-size: 20px;
+            color: black;
+            background-color: white;
+            padding: 10px 20px;
+           }
+           #canvas {
+            border: 2px solid black;
+           }
+           select {
+            font-size: 20px;
+            padding: 10px 20px;
+           }
+    </style>
+</head>
+<body>
+    <table>
+    <tbody><tr><td valign="top" width="50%">
+    <p>Click "Open" to create a connection to the server, 
+    "Send" to send a message to the server and "Close" to close the connection. 
+    You can change the message and send multiple times.
+    </p><p>
+    </p><form>
+    <button type="button" id="open">Open</button>
+    <button type="button" id="close">Close</button></form>
+    <img id="target" style="display:inline;"/>
+    <canvas id="canvas" ></canvas>
+    </td><td valign="top" width="50%">
+    <div id="output"></div>
+    </td></tr></tbody></table>
+    <script>
+
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    let imageSize = {
+        width : 640,
+        height : 400
+    }
+    window.onload = () => {
+        canvas.style.width = 640;
+        canvas.style.height = 400;
+    }
+        function draw(data) {
+            var arrayBufferView = new Uint8Array( data );
+            var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+            var urlCreator = window.URL || window.webkitURL;
+            var imageUrl = urlCreator.createObjectURL( blob );
+
+
+            var img  = new Image();
+
+            var imageData = imageUrl  //'data:image/jpeg;base64,' + Json;
+            img.src = imageData;
+
+            if (blob.size > 20000 && blob.size < 40000) {
+                imageSize.width = 640;
+                imageSize.height = 400;
+            }
+            if (blob.size > 60000 && blob.size < 100000) { //HD
+                imageSize.width = 1280;
+                imageSize.height = 720;
+            }
+            if (blob.size > 150000 && blob.size < 190000) { //FHD
+                imageSize.width = 1920;
+                imageSize.height = 1080;
+            }
+            if (blob.size > 200000 && blob.size < 300000) { //QHD
+                imageSize.width = 2560;
+                imageSize.height = 1440;
+            }
+            if (blob.size > 400000 && blob.size < 800000) {
+                imageSize.width = 3840;
+                imageSize.height = 2160;
+            }
+            if (blob.size > 900000) {
+                imageSize.width = 7680;
+                imageSize.height = 4320;
+            }
+
+            img.onload = function(){
+                canvas.style.width = imageSize.width;
+                canvas.style.height = imageSize.height;
+                canvas.width = imageSize.width;
+                canvas.height = imageSize.height;
+                ctx.drawImage(img,0,0,imageSize.width,imageSize.height);
+            };
+        }
+
+    </script>
+
+    </body>
+</html>

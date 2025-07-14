@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="./app.js" type="module"></script>
+        <title>moth web decoder</title>
+    </head>
+    <style>
+        body {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+        }
+        #moth-config,
+        #video-codec-config,
+        #audio-codec-config,
+        #sub,
+        #pub,
+        #recorder {
+            width: 90%;
+            border-radius: 8px;
+            border: black solid 2px;
+            padding: 1vw 2vw;
+        }
+        button {
+            padding: 0 1vw;
+            font-size: 1.4vw;
+            height: 3vw;
+            background: white;
+            color: black;
+            margin: 0 1vw;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            transition: all 0.5s;
+            background: black;
+            color: white;
+        }
+        #pub-video,
+        #sub-video {
+            width: "640";
+            height: "480";
+            background-color: black;
+        }
+    </style>
+    <body>
+        <div id="all">
+            <section id="moth">
+                <div id="moth-config">
+                    <h1>moth configs</h1>
+                    <label>moth destionation : </label>
+                    <input
+                        id="dest"
+                        type="text"
+                        placeholder="wss://cobot.center:8287"
+                    />
+                    <br />
+                    <label>moth api : </label>
+                    <input id="api" type="text" placeholder="/pang/ws/" />
+                    <br />
+                    <p>(pub or sub) will be auto included.</p>
+                    <label>pub(sub) channel : </label>
+                    <input id="channel" type="text" placeholder="instant" />
+                    <br />
+                    <label
+                        >name (Optional if Channel is not "instant") :
+                    </label>
+                    <input id="name" type="text" placeholder="webcodecs-test" />
+                    <br />
+
+                    <div id="buttons">
+                        <button id="save-moth-config">Save Moth Configs</button>
+                    </div>
+                </div>
+                <div id="sub">
+                    <h1>sub (video on canvas element) </h1>
+                    <canvas id="sub-video" width="640" height="480"></canvas>
+                    <audio
+                        autoplay="true"
+                        id="sub-audio"
+                    ></audio>
+                    <p>fps : <span id="fps"></span></p>
+                    <div id="buttons">
+                        <button id="start-decoding-subscribing">DECODING START</button>
+                        <button id="stop-decoding-subscribing">DECODING CLOSE</button>
+                        <button id="mute-audio">MUTE</button>
+                    </div>
+                    <div>
+                        <label>Video Codec : <span id="detected-video-codec"></span></label>
+                        <br />
+                        <label>Audio Codec : <span id="detected-audio-codec"></span></label>
+                    </div>
+                </div>
+                <div id="recorder">
+                    <h1>recording (video on video element)</h1>
+                    <video id="test" autoplay controls buffered></video>
+                    <a id="download-record"></a>
+                    <div id="buttons">
+                        <button id="start-recording">RECORDING START</button>
+                        <button id="save-recording">RECORDING CLOSE</button>
+                    </div>
+            </section>
+        </div>
+    </body>
+</html>

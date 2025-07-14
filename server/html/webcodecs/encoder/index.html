@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="./app.js" type="module"></script>
+        <title>moth web encoder</title>
+    </head>
+    <style>
+        body {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: repeat(3, 1fr);
+            width: 100%;
+            height: 100%;
+        }
+        #moth-config,
+        #video-codec-config,
+        #audio-codec-config,
+        #stress-test,
+        #pub {
+            border-radius: 8px;
+            border: black solid 2px;
+            padding: 1vw 2vw;
+        }
+        #pub {
+            grid-column: 1 / 2;
+            grid-row: 1 / span 3;
+        }
+        #moth-config {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+        }
+        button {
+            padding: 0 1vw;
+            font-size: 1.4vw;
+            height: 3vw;
+            background: white;
+            color: black;
+            margin: 0 1vw;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            transition: all 0.5s;
+            background: black;
+            color: white;
+        }
+        #pub-video,
+        #sub-video {
+            width: "640";
+            height: "480";
+            background-color: black;
+        }
+        #pub-image {
+            display: none;
+        }
+    </style>
+    <body>
+        <div class="container">
+                <div id="pub">
+                    <h1>pub</h1>
+                    <canvas id="pub-image"></canvas>
+                    <video
+                        autoplay="true"
+                        id="pub-video"
+                        width="640"
+                        height="480"
+                    ></video>
+                    <audio
+                        autoplay="false"
+                        id="pub-audio"
+                    ></audio>
+                    <div id="buttons">
+                        <button id="open-webcam">WEBCAM STREAM START</button>
+                        <button id="close-webcam">WEBCAM STREAM STOP</button>
+                        <br />
+                        <button id="open-mic">MIC STREAM START</button>
+                        <button id="close-mic">MIC STREAM STOP</button>
+                        <br />
+                        <button id="start-encoding-publishing">ENCODING START</button>
+                        <button id="stop-encoding-publishing">ENCODING CLOSE</button>
+                    </div>
+                </div>
+                <div id="moth-config">
+                    <h1>moth configs</h1>
+                    <label>moth destionation : </label>
+                    <input
+                        id="dest"
+                        type="text"
+                        placeholder="wss://cobot.center:8287"
+                    />
+                    <br />
+                    <label>moth api : </label>
+                    <input id="api" type="text" placeholder="/pang/ws/" />
+                    <br />
+                    <p>(pub or sub) will be auto included.</p>
+                    <label>pub(sub) channel : </label>
+                    <input id="channel" type="text" placeholder="instant" />
+                    <br />
+                    <label
+                        >name (Optional if Channel is not "instant") :
+                    </label>
+                    <input id="name" type="text" placeholder="webcodecs-test" />
+                    <br />
+
+                    <div id="buttons">
+                        <button id="save-moth-config">Save Moth Configs</button>
+                    </div>
+                </div>
+                <div id="video-codec-config">
+                    <h1>video codec configs</h1>
+                    <label>This Browser Supports : <span id="supported-video-codecs"></span></label>
+                    <br />
+                    <br />
+                    <label>codecs : </label>
+                    <select id="video-codecs">
+                        <option value="vp09.00.31.08">VP9 (vp09.00.31.08)</option>
+                        <option value="avc1.42E01F">H.264 (avc1.42E01F)</option>
+                        <option value="vp8">VP8</option>
+                        <option value="av01.0.05M.10">
+                            AV1 (av01.0.05M.10)
+                        </option>
+                        <option value="image/jpeg">image/jpeg</option>
+                        <option value="image/png">image/png</option>
+                        <!-- 
+                                <option value="vp9">VP9</option>
+                                <option value="h265">H265</option>
+                                <option value="image/webp">WEBP</option>
+                                <option value="image/avif">AVIF</option>
+                            // -->
+                    </select>
+                    <br />
+                    <label>video width (px) : </label>
+                    <input type="number" id="video-width" placeholder="640" />
+                    <br />
+                    <label>video height (px) : </label>
+                    <input type="number" id="video-height" placeholder="480" />
+                    <br />
+                    <label>bitrate (million) : </label>
+                    <input type="number" id="video-bitrate" placeholder="4" />
+                    <br />
+                    <label>keyframe interval : </label>
+                    <input type="number" id="video-interval" placeholder="60" />
+                    <br />
+                    <label>framerate (per second) : </label>
+                    <input type="number" id="video-framerate" placeholder="30" />
+                    <br />
+                    <label>Hardware Acceleration (if possible) : </label>
+                    <input type="checkbox" id="video-hw-acceleration" checked />
+                    <br />
+                    <div id="buttons">
+                        <button id="save-video-codec-config">Save Codec Configs</button>
+                    </div>
+                </div>
+                <div id="audio-codec-config">
+                    <h1>audio codec configs</h1>
+                    <label>This Browser Supports : <span id="supported-audio-codecs"></span></label>
+                    <br />
+                    <br />
+                    <label>codecs : </label>
+                    <select id="audio-codecs">
+                        <option value="opus">Opus</option>
+                        </option>
+                        <!-- 
+                                <option value="lyra">Lyra</option
+                            // -->
+                    </select>
+                    <br />
+                    <label>sample rate (kHz) : </label>
+                    <input type="number" id="audio-sampleRate" placeholder="48" />
+                    <br />
+                    <label>depth (bit) : </label>
+                    <input type="number" id="audio-depth" placeholder="16" />
+                    <br />
+                    <label>Number Of Channels : </label>
+                    <input type="number" id="audio-numberOfChannels" placeholder="1" />
+                    <br />
+                    <label>bitrate (kbps) : </label>
+                    <input type="number" id="audio-bitrate" placeholder="512" />
+                    <br />
+                    <div id="buttons">
+                        <button id="save-audio-codec-config">Save Codec Configs</button>
+                    </div>
+                    <div id="buttons">
+                        <button id="stress-test">Browser Stress Test</button>
+                    </div>
+                </div>
+        </div>
+    </body>
+</html>
