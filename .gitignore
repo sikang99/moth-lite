@@ -1,0 +1,18 @@
+#.gitignore
+
+# Apple files
+.DS_Store
+.vscode/
+
+# Media files
+*.avi
+*.ts
+*.mp3
+*.mp4
+*.mkv
+*.264
+*.265
+
+# DL model parameters
+*.weights
+
