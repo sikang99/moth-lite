@@ -62,7 +62,7 @@ func (d *Channel) startDataRecord(source, track string) (err error) {
 	log.Println("i.startDataRecord:", d.ID)
 
 	if d.State != Using {
-		err = fmt.Errorf("channel %snot in use", d.ID)
+		err = fmt.Errorf("channel %s not in use", d.ID)
 		return
 	}
 
