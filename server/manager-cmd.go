@@ -474,6 +474,28 @@ func (cmd *Command) setChannel() (str string, err error) {
 			err = fmt.Errorf("invalid style for channel: %s, %s, %s", cmd.ID, cmd.Opt, cmd.Value)
 			return
 		}
+	case "record":
+		switch cmd.State {
+		case "on":
+			p.RecordAuto = true
+		case "off":
+			p.RecordAuto = false
+		case "start":
+			if p.RecordState != Idle {
+				err = fmt.Errorf("recording is not idle: %s", p.RecordState.String())
+				return
+			}
+			go p.startDataRecord("base", "video")
+		case "stop":
+			if p.RecordState != Using {
+				err = fmt.Errorf("recording is not using: %s", p.RecordState.String())
+				return
+			}
+			p.stopDataRecord("base", "video")
+		default:
+			err = fmt.Errorf("invalid channel value: %s", cmd.Value)
+			return
+		}
 	default:
 		err = fmt.Errorf("%s command unknown option: %s", cmd.Op, cmd.Opt)
 		return

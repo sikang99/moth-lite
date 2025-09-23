@@ -64,7 +64,7 @@ func PrintManagerHelpMessage() {
 	fmt.Printf("\n\top     = [show|set|run|add|delete|load|save], [xid|ping|help|quit]")
 	fmt.Printf("\n\tobj    = [config:0|session:1|channel:2|group:4|bridge:5|punch:6|ticket:7|worker:8|studio:9]")
 	fmt.Printf("\n\tid     = <xid>")
-	fmt.Printf("\n\topt    = [state|name|key|record|trans|procs|relay|path|source|track|auto]")
+	fmt.Printf("\n\topt    = [state|name|key|record|path|source|track|auto]")
 	fmt.Printf("\n\tstate  = [idle|using|block|on|off|start|stop]")
 	fmt.Printf("\n\tstyle  = [static|instant|dynamic]")
 	fmt.Printf("\n\tformat = [json|text|mp4|webm]")
@@ -215,7 +215,7 @@ func ParseManagerCommand(cmdstr, base, key string) (cmd Command, err error) {
 			cmd.State = toks[i]
 		case "static", "dynamic", "instant":
 			cmd.Style = toks[i]
-		case "state", "block", "path", "source", "track", "actor", "name", "style", "key", "disk", "record", "trans", "procs", "relay", "auto":
+		case "state", "block", "path", "source", "track", "actor", "name", "style", "key", "disk", "record", "auto":
 			cmd.Opt = toks[i]
 		case "text", "json", "xml", "mp4", "webm":
 			cmd.Format = toks[i]

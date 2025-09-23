@@ -27,6 +27,10 @@
 
 
 ### Changelogs
+- 2025/09/23 : v2.1.7.6
+    - rename the new `Moth` into `Moth-Lite`
+    - add `start/stopDataRecord()` in `tool-record.go`
+------------------------------------------------------------------------------------------------------  
 - 2025/06/13 : v1.1.7.5
     - add "REXT" in the message handling
     - define `/pang/ws/a2a` for agent communication
