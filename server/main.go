@@ -23,7 +23,7 @@ import (
 
 // ---------------------------------------------------------------------------------
 func init() {
-	log.SetPrefix("\033[32m[Moth]\033[0m ")
+	log.SetPrefix("\033[33m[Moth-Lite]\033[0m ")
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 }
 
@@ -71,7 +71,7 @@ func main() {
 		// handler := mConfig.setupServerAPIs()
 		handler := mConfig.setupMuxServerAPIs()
 
-		mConfig.ProgramTitle = fmt.Sprintf("Moth Lite IoRT Media Server, v%s, (c)2025 TeamGRIT, Inc.", Version)
+		mConfig.ProgramTitle = fmt.Sprintf("Moth-Lite IoRT Media Server, v%s, (c)2025 TeamGRIT, Inc.", Version)
 		fmt.Println(mConfig.ProgramTitle)
 		log.Println(mConfig.ProgramTitle, "started on", mConfig.ProgramBase)
 		if mConfig.PortPlain == 0 && mConfig.PortSecure == 0 {
@@ -86,27 +86,27 @@ func main() {
 
 	// belows are clients for monitoring and testing
 	case "manager":
-		mConfig.ProgramTitle = fmt.Sprintf("Moth IoRT Media Manager (http), v%s, (c)2025 TeamGRIT, Inc.", Version)
+		mConfig.ProgramTitle = fmt.Sprintf("Moth-Lite IoRT Media Manager (http), v%s, (c)2025 TeamGRIT, Inc.", Version)
 		fmt.Println(mConfig.ProgramTitle)
 		// url := fmt.Sprintf("https://%s:%d/manager/http/cmd", mConfig.HostAddr, mConfig.PortSecure)
 		url := fmt.Sprintf("http://%s:%d/manager/http/cmd", mConfig.HostAddr, mConfig.PortPlain)
 		StartHTTPManagerClient(url, mConfig.KeyManager)
 		return
 	case "manager2":
-		mConfig.ProgramTitle = fmt.Sprintf("Moth IoRT Media Manager (ws), v%s, (c)2025 TeamGRIT, Inc.", Version)
+		mConfig.ProgramTitle = fmt.Sprintf("Moth-Lite IoRT Media Manager (ws), v%s, (c)2025 TeamGRIT, Inc.", Version)
 		fmt.Println(mConfig.ProgramTitle)
 		// url := fmt.Sprintf("wss://%s:%d/manager/ws/cmd", mConfig.HostAddr, mConfig.PortSecure)
 		url := fmt.Sprintf("ws://%s:%d/manager/ws/cmd", mConfig.HostAddr, mConfig.PortPlain)
 		StartWSManagerClient(url, mConfig.KeyManager)
 		return
 	case "monitor2":
-		mConfig.ProgramTitle = fmt.Sprintf("Moth IoRT Media Monitor (ws), v%s, (c)2025 TeamGRIT, Inc.", Version)
+		mConfig.ProgramTitle = fmt.Sprintf("Moth-Lite IoRT Media Monitor (ws), v%s, (c)2025 TeamGRIT, Inc.", Version)
 		fmt.Println(mConfig.ProgramTitle)
 		url := fmt.Sprintf("wss://%s:%d/monitor/ws/cmd", mConfig.HostAddr, mConfig.PortSecure)
 		StartWSMonitorClient(url)
 		return
 	case "control":
-		mConfig.ProgramTitle = fmt.Sprintf("Moth IoRT Media Controller (ws), v%s, (c)2022-5 TeamGRIT, Inc.", Version)
+		mConfig.ProgramTitle = fmt.Sprintf("Moth-Lite IoRT Media Controller (ws), v%s, (c)2022-5 TeamGRIT, Inc.", Version)
 		fmt.Println(mConfig.ProgramTitle)
 		url := fmt.Sprintf("wss://%s:%d/pang/ws/ctl?channel=%s", mConfig.HostAddr, mConfig.PortSecure, "c40hp6epjh65aeq6ne50")
 		StartWSControlClient(url, "c40hp6epjh65aeq6ne50")

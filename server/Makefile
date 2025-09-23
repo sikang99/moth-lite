@@ -6,7 +6,8 @@ NAME=moth-lite
 usage: 
 	@echo "usage: make [build|run|kill|clean] for $(NAME)"
 build b:
-	go build -ldflags="-s -w" -trimpath -o $(NAME)
+	GOFIPS140=v1.0.0 go build -ldflags="-s -w" -trimpath -o $(NAME)
+	#go build -ldflags="-s -w" -trimpath -o $(NAME)
 	#go build -trimpath -o $(NAME)
 	#tinygo build -o $(NAME)
 
