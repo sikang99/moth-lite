@@ -879,16 +879,16 @@ func (cmd *Command) setConfig() (str string, err error) {
 	return FormatItem(mConfig, cmd.Format)
 }
 
-func (cmd *Command) saveConfig() (str string, err error) {
-	log.Println("i.saveConfig:", cmd.Op)
-	err = os.Rename("conf/moth.json", "conf/moth.json.bak")
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	err = pStudio.writeObjectFileInArray("config", "conf/moth.json")
-	return
-}
+// func (cmd *Command) saveConfig() (str string, err error) {
+// 	log.Println("i.saveConfig:", cmd.Op)
+// 	err = os.Rename("conf/moth.json", "conf/moth.json.bak")
+// 	if err != nil {
+// 		log.Println(err)
+// 		return
+// 	}
+// 	err = pStudio.writeObjectFileInArray("config", "conf/moth.json")
+// 	return
+// }
 
 // --------------------------------------------------------------------------------
 func (cmd *Command) showSystem() (str string, err error) {

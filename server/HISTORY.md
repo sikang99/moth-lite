@@ -27,7 +27,11 @@
 
 
 ### Changelogs
+- 2025/11/02 : v2.1.7.7
 - 2025/09/23 : v2.1.7.6
+    - make docker images and upload dockerhub
+        - `cojam/moth-lite:2.1.7.6-alpine3.20-amd64`
+        - `cojam/moth-lite:2.1.7.6-alpine3.20-arm64`
     - rename the new `Moth` into `Moth-Lite`
     - add `start/stopDataRecord()` in `tool-record.go`
 ------------------------------------------------------------------------------------------------------  
