@@ -324,7 +324,11 @@ func (d *License) codeString() (str string) {
 	case 8292, 8277: // http://teamgrit/kr, 8267 for Spider
 		str = "korea/teamgrit-lab"
 	default:
-		str = "unknown"
+		if d.code < 10000 {
+			str = "not assigned"
+		} else {
+			str = "unknown"
+		}
 	}
 	return
 }
