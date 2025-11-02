@@ -11,15 +11,14 @@ ADD ./server /go/src/github.com/sikang99/moth/server
 RUN cd /go/src/github.com/sikang99/moth/server \
     && go build -ldflags="-s -w" -trimpath -o moth-server
 RUN mv /go/src/github.com/sikang99/moth/server/moth-server /moth
-##--------------------------------------------------------------------------
-RUN mkdir -p /moth/cmd
 ##=================================================================================
-ENV CGO_ENABLED=1
-RUN mkdir -p /moth/tools
+#RUN mkdir -p /moth/cmd
+#ENV CGO_ENABLED=1
+#RUN mkdir -p /moth/tools
 ##--------------------------------------------------------------------------
-RUN apk add --no-cache ca-certificates \
-    musl-dev make gcc curl
-
+#RUN apk add --no-cache ca-certificates \
+#    musl-dev make gcc curl
+##--------------------------------------------------------------------------
 RUN rm -rf /go/src/*
 ADD ./server/cert /moth/cert/
 ADD ./server/conf /moth/conf/
