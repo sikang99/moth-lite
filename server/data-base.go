@@ -241,10 +241,10 @@ type Channel struct {
 	sync.Mutex
 	eventChan chan EventMessage `json:"-"`
 	recordCmd *exec.Cmd         `json:"-"`
-	transCmd  *exec.Cmd         `json:"-"`
-	procsCmd  *exec.Cmd         `json:"-"`
-	relayCmd  *exec.Cmd         `json:"-"`
-	shootCmd  *exec.Cmd         `json:"-"`
+	// transCmd  *exec.Cmd         `json:"-"`
+	// procsCmd  *exec.Cmd         `json:"-"`
+	// relayCmd  *exec.Cmd         `json:"-"`
+	// shootCmd  *exec.Cmd         `json:"-"`
 }
 
 // custom json marshal

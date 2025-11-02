@@ -72,26 +72,26 @@ func NewSignalGroup(name string) (d *SignalGroup) {
 	return
 }
 
-func (d *SignalGroup) findClient(ws *websocket.Conn) (r *SignalClient) {
-	d.Lock()
-	defer d.Unlock()
-	r = d.Clients[ws]
-	return
-}
+// func (d *SignalGroup) findClient(ws *websocket.Conn) (r *SignalClient) {
+// 	d.Lock()
+// 	defer d.Unlock()
+// 	r = d.Clients[ws]
+// 	return
+// }
 
-func (d *SignalGroup) addClient(ws *websocket.Conn, sc *SignalClient) (r *SignalClient) {
-	d.Lock()
-	defer d.Unlock()
-	d.Clients[ws] = sc
-	return
-}
+// func (d *SignalGroup) addClient(ws *websocket.Conn, sc *SignalClient) (r *SignalClient) {
+// 	d.Lock()
+// 	defer d.Unlock()
+// 	d.Clients[ws] = sc
+// 	return
+// }
 
-func (d *SignalGroup) deleteClient(ws *websocket.Conn) {
-	d.Lock()
-	defer d.Unlock()
-	delete(d.Clients, ws)
-	return
-}
+// func (d *SignalGroup) deleteClient(ws *websocket.Conn) {
+// 	d.Lock()
+// 	defer d.Unlock()
+// 	delete(d.Clients, ws)
+// 	return
+// }
 
 // ---------------------------------------------------------------------------------
 type SignalCenter struct {
@@ -118,26 +118,26 @@ func NewSignalCenter(name string) (d *SignalCenter) {
 	return
 }
 
-func (d *SignalCenter) findGroup(id string) (r *SignalGroup) {
-	d.Lock()
-	defer d.Unlock()
-	r = d.Groups[id]
-	return
-}
+// func (d *SignalCenter) findGroup(id string) (r *SignalGroup) {
+// 	d.Lock()
+// 	defer d.Unlock()
+// 	r = d.Groups[id]
+// 	return
+// }
 
-func (d *SignalCenter) addGroup(sc *SignalGroup) (r *SignalGroup) {
-	d.Lock()
-	defer d.Unlock()
-	d.Groups[sc.ID] = sc
-	return
-}
+// func (d *SignalCenter) addGroup(sc *SignalGroup) (r *SignalGroup) {
+// 	d.Lock()
+// 	defer d.Unlock()
+// 	d.Groups[sc.ID] = sc
+// 	return
+// }
 
-func (d *SignalCenter) deleteGroup(id string) {
-	d.Lock()
-	defer d.Unlock()
-	delete(d.Groups, id)
-	return
-}
+// func (d *SignalCenter) deleteGroup(id string) {
+// 	d.Lock()
+// 	defer d.Unlock()
+// 	delete(d.Groups, id)
+// 	return
+// }
 
 // ---------------------------------------------------------------------------------
 func ProcSignalMessage(rm, sm *SignalMessage) (err error) {

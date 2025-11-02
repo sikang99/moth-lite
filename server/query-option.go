@@ -77,7 +77,7 @@ type QueryOption struct {
 }
 
 func (d QueryOption) String() (str string) {
-	str += fmt.Sprintf("QueryOption:")
+	str += "QueryOption:"
 	str += fmt.Sprintf("\n\t[URL] Scheme: %s, Path: %s, Addr: %s",
 		d.URL.Scheme, d.URL.Path, d.URL.Addr)
 	str += fmt.Sprintf("\n\t[Channel: %s,%s], [Source: %s], [Track: %s,%s]",

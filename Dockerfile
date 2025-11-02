@@ -3,7 +3,7 @@ FROM golang:1.22.12-alpine3.20
 ##---------------------------------------------------------------------------------
 LABEL maintainer="Stoney Kang, sikang@teamgrit.kr"
 ##=================================================================================
-ENV GO111MODULE=on
+#ENV GO111MODULE=on
 RUN mkdir -p /moth
 ##--------------------------------------------------------------------------
 RUN mkdir -p /go/src/github.com/sikang99/moth/server
