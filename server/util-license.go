@@ -317,7 +317,15 @@ func (d *License) codeString() (str string) {
 		str = "korea/nics"
 	case 8210: // https://roas.co.kr/, 2025/06/18
 		str = "korea/roas"
-	case 8211, 8212, 8213, 8214: // https://next-coming.kr/
+	case 8211: // https://www.samsungena.com/kr/, 2025/07/15, sales by ROAS
+		str = "korea/samsungena"
+	case 8212: // https://www.inbic.co.kr/, 2025/08/12
+		str = "korea/inbic"
+	case 8213: //https://www.hoseo.ac.kr/, 2025/10/20
+		str = "korea/hoseo"
+	case 8214: // https://lgp5g.com/
+		str = "korea/lgp5g"
+	case 8215, 8216: // https://next-coming.kr/
 		str = "korea/coming"
 	case 8291, 8276: // http://teamgrit/kr, 8266 for Spider
 		str = "korea/teamgrit"
