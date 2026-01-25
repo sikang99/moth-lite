@@ -1,4 +1,4 @@
-## Moth Server
+## Moth Lite Server
 > IoT Media Streaming based on JPEG, VP8, H264, AV1, ... (any codec)
 
 
@@ -13,6 +13,11 @@
 ### Open Source
 - [avelino/awesome-go](https://github.com/avelino/awesome-go) - A curated list of awesome Go frameworks, libraries and software
 - [multiformats/go-multistream](https://github.com/multiformats/go-multistream) - an implementation of the multistream protocol in go
+
+
+---------
+## Direct Socket
+- [WICG/direct-sockets](https://github.com/WICG/direct-sockets) - Direct Sockets API for the web platform
 
 
 ---------
